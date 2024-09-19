@@ -16,14 +16,14 @@ class EbayHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // AppBar remains the same
       appBar: AppBar(
         title: Text('eBay Clone', style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Image.network(
-              'https://upload.wikimedia.org/wikipedia/commons/a/a6/Ebay_logo.png'), // eBay logo
+          child: Image.asset('assets/images/ebay_logo.png'), // eBay logo
         ),
         actions: [
           IconButton(
@@ -97,7 +97,7 @@ class EbayHomePage extends StatelessWidget {
           ],
         ),
       ),
-      // Bottom Navigation Bar
+      // Bottom Navigation Bar remains the same
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: 0,
@@ -129,19 +129,19 @@ class EbayHomePage extends StatelessWidget {
     List<Map<String, String>> items = [
       {
         'label': 'Laptops',
-        'image': 'https://example.com/laptops_image.png',
+        'image': 'assets/images/laptops_image.png',
       },
       {
         'label': 'Gaming Laptops',
-        'image': 'https://example.com/gaming_laptops_image.png',
+        'image': 'assets/images/gaming_laptops_image.png',
       },
       {
         'label': 'All-In-One',
-        'image': 'https://example.com/all_in_one_image.png',
+        'image': 'assets/images/all_in_one_image.png',
       },
       {
         'label': 'Components',
-        'image': 'https://example.com/components_image.png',
+        'image': 'assets/images/components_image.png',
       },
     ];
 
@@ -157,7 +157,7 @@ class EbayHomePage extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 40,
-                backgroundImage: NetworkImage(item['image']!),
+                backgroundImage: AssetImage(item['image']!),
               ),
               SizedBox(height: 5),
               Text(
@@ -195,33 +195,33 @@ class EbayHomePage extends StatelessWidget {
   Widget _buildFeaturedItemsSection() {
     List<Map<String, String>> featuredItems = [
       {
-        'name': 'MacBook Pro',
-        'image': 'https://example.com/macbook_pro.png',
-        'price': '\$1299',
+        'name': 'Alienware M18 R2',
+        'image': 'assets/images/Alienware_M18_R2.jpg',
+        'price': '\$3499',
       },
       {
         'name': 'Gaming PC',
-        'image': 'https://example.com/gaming_pc.png',
+        'image': 'assets/images/gaming_pc.png',
         'price': '\$999',
       },
       {
         'name': 'Graphics Card',
-        'image': 'https://example.com/graphics_card.png',
+        'image': 'assets/images/graphics_card.png',
         'price': '\$499',
       },
       {
         'name': 'Mechanical Keyboard',
-        'image': 'https://example.com/mechanical_keyboard.png',
+        'image': 'assets/images/mechanical_keyboard.png',
         'price': '\$199',
       },
       {
         'name': 'Gaming Monitor',
-        'image': 'https://example.com/gaming_monitor.png',
+        'image': 'assets/images/gaming_monitor.png',
         'price': '\$299',
       },
       {
         'name': 'Wireless Mouse',
-        'image': 'https://example.com/wireless_mouse.png',
+        'image': 'assets/images/wireless_mouse.png',
         'price': '\$49',
       },
     ];
@@ -234,32 +234,32 @@ class EbayHomePage extends StatelessWidget {
     List<Map<String, String>> gamingLaptops = [
       {
         'name': 'Alienware M15',
-        'image': 'https://example.com/alienware_m15.png',
+        'image': 'assets/images/alienware_m15.png',
         'price': '\$1799',
       },
       {
         'name': 'Razer Blade 15',
-        'image': 'https://example.com/razer_blade_15.png',
+        'image': 'assets/images/razer_blade_15.png',
         'price': '\$1999',
       },
       {
         'name': 'ASUS ROG Zephyrus',
-        'image': 'https://example.com/asus_rog_zephyrus.png',
+        'image': 'assets/images/asus_rog_zephyrus.png',
         'price': '\$1599',
       },
       {
         'name': 'MSI GS66 Stealth',
-        'image': 'https://example.com/msi_gs66_stealth.png',
+        'image': 'assets/images/msi_gs66_stealth.png',
         'price': '\$1499',
       },
       {
         'name': 'Acer Predator Helios',
-        'image': 'https://example.com/acer_predator_helios.png',
+        'image': 'assets/images/acer_predator_helios.png',
         'price': '\$1299',
       },
       {
         'name': 'Lenovo Legion 5',
-        'image': 'https://example.com/lenovo_legion_5.png',
+        'image': 'assets/images/lenovo_legion_5.png',
         'price': '\$1099',
       },
     ];
@@ -272,23 +272,23 @@ class EbayHomePage extends StatelessWidget {
     List<Map<String, String>> brands = [
       {
         'label': 'Lenovo',
-        'image': 'https://example.com/lenovo_logo.png',
+        'image': 'assets/images/lenovo_logo.png',
       },
       {
         'label': 'Razer',
-        'image': 'https://example.com/razer_logo.png',
+        'image': 'assets/images/razer_logo.png',
       },
       {
         'label': 'Asus',
-        'image': 'https://example.com/asus_logo.png',
+        'image': 'assets/images/asus_logo.png',
       },
       {
         'label': 'HP',
-        'image': 'https://example.com/hp_logo.png',
+        'image': 'assets/images/hp_logo.png',
       },
       {
         'label': 'Dell',
-        'image': 'https://example.com/dell_logo.png',
+        'image': 'assets/images/dell_logo.png',
       },
     ];
 
@@ -305,7 +305,7 @@ class EbayHomePage extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 40,
-                  backgroundImage: NetworkImage(brand['image']!),
+                  backgroundImage: AssetImage(brand['image']!),
                 ),
                 SizedBox(height: 5),
                 Text(
@@ -321,37 +321,37 @@ class EbayHomePage extends StatelessWidget {
     );
   }
 
-  // Helper to build the laptops section (Moved After Brands Section)
+  // Helper to build the laptops section
   Widget _buildLaptopsSection() {
     List<Map<String, String>> laptops = [
       {
         'name': 'Dell XPS 13',
-        'image': 'https://example.com/dell_xps_13.png',
+        'image': 'assets/images/dell_xps_13.png',
         'price': '\$999',
       },
       {
         'name': 'MacBook Air',
-        'image': 'https://example.com/macbook_air.png',
+        'image': 'assets/images/macbook_air.png',
         'price': '\$1099',
       },
       {
         'name': 'HP Spectre x360',
-        'image': 'https://example.com/hp_spectre_x360.png',
+        'image': 'assets/images/hp_spectre_x360.png',
         'price': '\$1199',
       },
       {
         'name': 'Lenovo ThinkPad X1',
-        'image': 'https://example.com/lenovo_thinkpad_x1.png',
+        'image': 'assets/images/lenovo_thinkpad_x1.png',
         'price': '\$1299',
       },
       {
         'name': 'Asus ZenBook 14',
-        'image': 'https://example.com/asus_zenbook_14.png',
+        'image': 'assets/images/asus_zenbook_14.png',
         'price': '\$899',
       },
       {
         'name': 'Microsoft Surface Laptop',
-        'image': 'https://example.com/surface_laptop.png',
+        'image': 'assets/images/surface_laptop.png',
         'price': '\$999',
       },
     ];
@@ -376,10 +376,11 @@ class EbayHomePage extends StatelessWidget {
               children: [
                 // Product Image
                 Container(
-                  height: 150,
+                  height: index == 0 && item['name'] == 'Alienware M18 R2' ? 120 : 150,
+                  // Decrease the height for the first item
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: NetworkImage(item['image']!),
+                      image: AssetImage(item['image']!),
                       fit: BoxFit.cover,
                     ),
                     borderRadius: BorderRadius.circular(10),
@@ -388,13 +389,13 @@ class EbayHomePage extends StatelessWidget {
                 SizedBox(height: 10),
                 // Product Name
                 Text(
-                  item['name']!,
+                  item['name'] ?? '',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 5),
                 // Product Price
                 Text(
-                  item['price']!,
+                  item['price'] ?? '',
                   style: TextStyle(color: Colors.green),
                 ),
               ],
