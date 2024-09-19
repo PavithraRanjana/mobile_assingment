@@ -17,6 +17,7 @@ class EbayHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text('eBay Clone', style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: Padding(
@@ -69,9 +70,30 @@ class EbayHomePage extends StatelessWidget {
             // Featured Items Section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: _buildFeaturedItemsHeader(context),
+              child: _buildSectionHeader(context, "Featured Items"),
             ),
             _buildFeaturedItemsSection(),
+            // Gaming Laptops Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: _buildSectionHeader(context, "Gaming Laptops"),
+            ),
+            _buildGamingLaptopsSection(),
+            // Brands Section
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Text(
+                "Our Brands",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+            ),
+            _buildBrandsSection(),
+            // Laptops Section (Moved After Brands Section)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: _buildSectionHeader(context, "Laptops"),
+            ),
+            _buildLaptopsSection(),
           ],
         ),
       ),
@@ -149,18 +171,18 @@ class EbayHomePage extends StatelessWidget {
     );
   }
 
-  // Helper to build the featured items header with "See All" button
-  Widget _buildFeaturedItemsHeader(BuildContext context) {
+  // Helper to build section headers with "See All" button
+  Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text("Featured Items",
+          Text(title,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           TextButton(
             onPressed: () {
-              // Navigate to the full list of featured items
+              // Navigate to the full list of items for this section
             },
             child: Text("See All"),
           ),
@@ -204,13 +226,148 @@ class EbayHomePage extends StatelessWidget {
       },
     ];
 
+    return _buildHorizontalListView(featuredItems);
+  }
+
+  // Helper to build the gaming laptops section
+  Widget _buildGamingLaptopsSection() {
+    List<Map<String, String>> gamingLaptops = [
+      {
+        'name': 'Alienware M15',
+        'image': 'https://example.com/alienware_m15.png',
+        'price': '\$1799',
+      },
+      {
+        'name': 'Razer Blade 15',
+        'image': 'https://example.com/razer_blade_15.png',
+        'price': '\$1999',
+      },
+      {
+        'name': 'ASUS ROG Zephyrus',
+        'image': 'https://example.com/asus_rog_zephyrus.png',
+        'price': '\$1599',
+      },
+      {
+        'name': 'MSI GS66 Stealth',
+        'image': 'https://example.com/msi_gs66_stealth.png',
+        'price': '\$1499',
+      },
+      {
+        'name': 'Acer Predator Helios',
+        'image': 'https://example.com/acer_predator_helios.png',
+        'price': '\$1299',
+      },
+      {
+        'name': 'Lenovo Legion 5',
+        'image': 'https://example.com/lenovo_legion_5.png',
+        'price': '\$1099',
+      },
+    ];
+
+    return _buildHorizontalListView(gamingLaptops);
+  }
+
+  // Helper to build the brands section
+  Widget _buildBrandsSection() {
+    List<Map<String, String>> brands = [
+      {
+        'label': 'Lenovo',
+        'image': 'https://example.com/lenovo_logo.png',
+      },
+      {
+        'label': 'Razer',
+        'image': 'https://example.com/razer_logo.png',
+      },
+      {
+        'label': 'Asus',
+        'image': 'https://example.com/asus_logo.png',
+      },
+      {
+        'label': 'HP',
+        'image': 'https://example.com/hp_logo.png',
+      },
+      {
+        'label': 'Dell',
+        'image': 'https://example.com/dell_logo.png',
+      },
+    ];
+
+    return Container(
+      height: 120, // Adjust the height as needed
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: brands.map((brand) {
+          return Container(
+            width: 80, // Adjust the width as needed
+            margin: EdgeInsets.symmetric(horizontal: 10),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircleAvatar(
+                  radius: 40,
+                  backgroundImage: NetworkImage(brand['image']!),
+                ),
+                SizedBox(height: 5),
+                Text(
+                  brand['label']!,
+                  style: TextStyle(fontSize: 14),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  // Helper to build the laptops section (Moved After Brands Section)
+  Widget _buildLaptopsSection() {
+    List<Map<String, String>> laptops = [
+      {
+        'name': 'Dell XPS 13',
+        'image': 'https://example.com/dell_xps_13.png',
+        'price': '\$999',
+      },
+      {
+        'name': 'MacBook Air',
+        'image': 'https://example.com/macbook_air.png',
+        'price': '\$1099',
+      },
+      {
+        'name': 'HP Spectre x360',
+        'image': 'https://example.com/hp_spectre_x360.png',
+        'price': '\$1199',
+      },
+      {
+        'name': 'Lenovo ThinkPad X1',
+        'image': 'https://example.com/lenovo_thinkpad_x1.png',
+        'price': '\$1299',
+      },
+      {
+        'name': 'Asus ZenBook 14',
+        'image': 'https://example.com/asus_zenbook_14.png',
+        'price': '\$899',
+      },
+      {
+        'name': 'Microsoft Surface Laptop',
+        'image': 'https://example.com/surface_laptop.png',
+        'price': '\$999',
+      },
+    ];
+
+    return _buildHorizontalListView(laptops);
+  }
+
+  // General helper to build horizontal list views
+  Widget _buildHorizontalListView(List<Map<String, String>> items) {
     return Container(
       height: 250, // Adjust the height as needed
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: featuredItems.length,
+        itemCount: items.length,
         itemBuilder: (context, index) {
-          final item = featuredItems[index];
+          final item = items[index];
           return Container(
             width: 160,
             margin: EdgeInsets.only(left: 10, right: 10, bottom: 20),
