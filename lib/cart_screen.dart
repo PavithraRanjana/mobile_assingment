@@ -43,10 +43,8 @@ class CartScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Shopping Cart', style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black), // Change back button color
+        title: Text('Shopping Cart'),
+        // Colors and styles are managed by the theme
       ),
       body: Column(
         children: [
@@ -69,8 +67,8 @@ class CartScreen extends StatelessWidget {
                       children: [
                         // Item Image (Scaled Down)
                         Container(
-                          width: 50, // Reduced width
-                          height: 50, // Reduced height
+                          width: 50, // Scaled down width
+                          height: 50, // Scaled down height
                           child: Image.asset(
                             item['image'],
                             fit: BoxFit.cover,
@@ -85,7 +83,7 @@ class CartScreen extends StatelessWidget {
                               // Item Name
                               Text(
                                 item['name'],
-                                style: TextStyle(
+                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
@@ -100,11 +98,14 @@ class CartScreen extends StatelessWidget {
                                     onPressed: () {
                                       // Decrease quantity logic (not implemented)
                                     },
+                                    color: Theme.of(context).colorScheme.primary,
                                   ),
                                   // Quantity Text
                                   Text(
                                     '$quantity',
-                                    style: TextStyle(fontSize: 16),
+                                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      fontSize: 16,
+                                    ),
                                   ),
                                   // Increase Quantity Button
                                   IconButton(
@@ -112,12 +113,13 @@ class CartScreen extends StatelessWidget {
                                     onPressed: () {
                                       // Increase quantity logic (not implemented)
                                     },
+                                    color: Theme.of(context).colorScheme.primary,
                                   ),
                                   SizedBox(width: 15), // Adjusted spacing
                                   // Item Total Price (Moved Slightly to Left)
                                   Text(
                                     '\$${itemTotalPrice.toStringAsFixed(2)}',
-                                    style: TextStyle(
+                                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -133,6 +135,7 @@ class CartScreen extends StatelessWidget {
                           onPressed: () {
                             // Delete item logic (not implemented)
                           },
+                          color: Theme.of(context).colorScheme.secondary,
                         ),
                       ],
                     ),
@@ -144,7 +147,7 @@ class CartScreen extends StatelessWidget {
           // Bottom Total Container
           Container(
             padding: EdgeInsets.all(16.0),
-            color: Colors.grey[200],
+            color: Theme.of(context).colorScheme.background.withOpacity(0.1),
             child: Column(
               children: [
                 // Total Number of Items
@@ -153,11 +156,13 @@ class CartScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Total number of items:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Text(
                       '$totalItems',
-                      style: TextStyle(),
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ],
                 ),
@@ -168,11 +173,13 @@ class CartScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Price:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Text(
                       '\$${totalPrice.toStringAsFixed(2)}',
-                      style: TextStyle(),
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ],
                 ),
@@ -183,11 +190,13 @@ class CartScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Total Price:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Text(
                       '\$${totalPrice.toStringAsFixed(2)}',
-                      style: TextStyle(),
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ],
                 ),
@@ -199,17 +208,7 @@ class CartScreen extends StatelessWidget {
                     onPressed: () {
                       // Checkout logic (not implemented)
                     },
-                    style: ElevatedButton.styleFrom(
-                      // primary: Colors.blue[800], // Dark blue color
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
-                    ),
-                    child: Text(
-                      'Checkout',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: Text('Checkout'),
                   ),
                 ),
               ],
