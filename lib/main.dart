@@ -200,29 +200,29 @@ class EbayHomePage extends StatelessWidget {
         'price': '\$3499',
       },
       {
-        'name': 'Gaming PC',
-        'image': 'assets/images/gaming_pc.png',
-        'price': '\$999',
+        'name': 'Alienware X15 R1',
+        'image': 'assets/images/Alienware_X15R1.png',
+        'price': '\$2499',
       },
       {
-        'name': 'Graphics Card',
-        'image': 'assets/images/graphics_card.png',
-        'price': '\$499',
+        'name': 'ROG Strix G15 2022 G513',
+        'image': 'assets/images/ROG_Strix_G15_2022_G513.png',
+        'price': '\$1599',
       },
       {
-        'name': 'Mechanical Keyboard',
-        'image': 'assets/images/mechanical_keyboard.png',
-        'price': '\$199',
+        'name': 'ROG Zephyrus G16 2024',
+        'image': 'assets/images/ROG_Zephyrus_G16_2024.png',
+        'price': '\$1899',
       },
       {
-        'name': 'Gaming Monitor',
-        'image': 'assets/images/gaming_monitor.png',
-        'price': '\$299',
+        'name': 'Alienware X16 R1',
+        'image': 'assets/images/Alienware_X16_R1.jpg',
+        'price': '\$2999',
       },
       {
-        'name': 'Wireless Mouse',
-        'image': 'assets/images/wireless_mouse.png',
-        'price': '\$49',
+        'name': 'Razer Blade 14 2024',
+        'image': 'assets/images/Razer_Blade_14_2024.jpg',
+        'price': '\$2299', // Adjust the price as needed
       },
     ];
 
@@ -368,6 +368,18 @@ class EbayHomePage extends StatelessWidget {
         itemCount: items.length,
         itemBuilder: (context, index) {
           final item = items[index];
+          // Adjust image height for specific items if necessary
+          double imageHeight = 150;
+
+          if (item['name'] == 'Alienware M18 R2' ||
+              item['name'] == 'Alienware X15 R1' ||
+              item['name'] == 'ROG Strix G15 2022 G513' ||
+              item['name'] == 'ROG Zephyrus G16 2024' ||
+              item['name'] == 'Alienware X16 R1' ||
+              item['name'] == 'Razer Blade 14 2024') {
+            imageHeight = 120; // Adjusted height for the first six items
+          }
+
           return Container(
             width: 160,
             margin: EdgeInsets.only(left: 10, right: 10, bottom: 20),
@@ -376,8 +388,7 @@ class EbayHomePage extends StatelessWidget {
               children: [
                 // Product Image
                 Container(
-                  height: index == 0 && item['name'] == 'Alienware M18 R2' ? 120 : 150,
-                  // Decrease the height for the first item
+                  height: imageHeight,
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image: AssetImage(item['image']!),
