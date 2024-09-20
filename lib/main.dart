@@ -88,7 +88,7 @@ class EbayHomePage extends StatelessWidget {
               ),
             ),
             _buildBrandsSection(),
-            // Laptops Section (Moved After Brands Section)
+            // Laptops Section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: _buildSectionHeader(context, "Laptops"),
@@ -222,7 +222,7 @@ class EbayHomePage extends StatelessWidget {
       {
         'name': 'Razer Blade 14 2024',
         'image': 'assets/images/Razer_Blade_14_2024.jpg',
-        'price': '\$2299', // Adjust the price as needed
+        'price': '\$2299',
       },
     ];
 
@@ -233,34 +233,34 @@ class EbayHomePage extends StatelessWidget {
   Widget _buildGamingLaptopsSection() {
     List<Map<String, String>> gamingLaptops = [
       {
-        'name': 'Alienware M15',
-        'image': 'assets/images/alienware_m15.png',
+        'name': 'ROG Strix G17',
+        'image': 'assets/images/ROG_Strix_G17.png',
         'price': '\$1799',
       },
       {
-        'name': 'Razer Blade 15',
-        'image': 'assets/images/razer_blade_15.png',
-        'price': '\$1999',
+        'name': 'ASUS ROG Strix G18',
+        'image': 'assets/images/ASUS_ROG_Strix_G18.png',
+        'price': '\$1899',
       },
       {
-        'name': 'ASUS ROG Zephyrus',
-        'image': 'assets/images/asus_rog_zephyrus.png',
+        'name': 'ASUS ROG Strix G16',
+        'image': 'assets/images/ASUS_ROG_Strix_G16.png',
+        'price': '\$1699',
+      },
+      {
+        'name': 'Alienware X16 R1',
+        'image': 'assets/images/Alienware_X16_R1.jpg',
+        'price': '\$2999',
+      },
+      {
+        'name': 'Razer Blade 16 2024',
+        'image': 'assets/images/Razer_Blade_16_2024.jpg',
+        'price': '\$2599',
+      },
+      {
+        'name': 'ROG Strix G15 2022 G513',
+        'image': 'assets/images/ROG_Strix_G15_2022_G513.png',
         'price': '\$1599',
-      },
-      {
-        'name': 'MSI GS66 Stealth',
-        'image': 'assets/images/msi_gs66_stealth.png',
-        'price': '\$1499',
-      },
-      {
-        'name': 'Acer Predator Helios',
-        'image': 'assets/images/acer_predator_helios.png',
-        'price': '\$1299',
-      },
-      {
-        'name': 'Lenovo Legion 5',
-        'image': 'assets/images/lenovo_legion_5.png',
-        'price': '\$1099',
       },
     ];
 
@@ -321,38 +321,38 @@ class EbayHomePage extends StatelessWidget {
     );
   }
 
-  // Helper to build the laptops section
+  // Updated Helper to build the laptops section
   Widget _buildLaptopsSection() {
     List<Map<String, String>> laptops = [
       {
-        'name': 'Dell XPS 13',
-        'image': 'assets/images/dell_xps_13.png',
-        'price': '\$999',
-      },
-      {
-        'name': 'MacBook Air',
-        'image': 'assets/images/macbook_air.png',
-        'price': '\$1099',
-      },
-      {
-        'name': 'HP Spectre x360',
-        'image': 'assets/images/hp_spectre_x360.png',
+        'name': 'Lenovo ThinkPad T14',
+        'image': 'assets/images/Lenovo_ThinkPad_T14.png',
         'price': '\$1199',
       },
       {
-        'name': 'Lenovo ThinkPad X1',
-        'image': 'assets/images/lenovo_thinkpad_x1.png',
+        'name': 'Lenovo Yoga 7i 2-in-1',
+        'image': 'assets/images/Lenovo_Yoga_7i_2-in-1.png',
+        'price': '\$999',
+      },
+      {
+        'name': 'Lenovo Yoga 9i',
+        'image': 'assets/images/Lenovo_Yoga_9i.png',
         'price': '\$1299',
       },
       {
-        'name': 'Asus ZenBook 14',
-        'image': 'assets/images/asus_zenbook_14.png',
-        'price': '\$899',
+        'name': 'Lenovo Yoga 9i 2-in-1',
+        'image': 'assets/images/Lenovo_Yoga_9i_2-in-1.png',
+        'price': '\$1399',
       },
       {
-        'name': 'Microsoft Surface Laptop',
-        'image': 'assets/images/surface_laptop.png',
-        'price': '\$999',
+        'name': 'ASUS Zenbook Pro 14 OLED',
+        'image': 'assets/images/ASUS_Zenbook_Pro_14_OLED.png',
+        'price': '\$1499',
+      },
+      {
+        'name': 'ROG Strix G17',
+        'image': 'assets/images/ROG_Strix_G17.png',
+        'price': '\$1799',
       },
     ];
 
@@ -371,13 +371,27 @@ class EbayHomePage extends StatelessWidget {
           // Adjust image height for specific items if necessary
           double imageHeight = 150;
 
-          if (item['name'] == 'Alienware M18 R2' ||
-              item['name'] == 'Alienware X15 R1' ||
-              item['name'] == 'ROG Strix G15 2022 G513' ||
-              item['name'] == 'ROG Zephyrus G16 2024' ||
-              item['name'] == 'Alienware X16 R1' ||
-              item['name'] == 'Razer Blade 14 2024') {
-            imageHeight = 120; // Adjusted height for the first six items
+          // List of item names with adjusted image height
+          List<String> adjustedItems = [
+            'Alienware M18 R2',
+            'Alienware X15 R1',
+            'ROG Strix G15 2022 G513',
+            'ROG Zephyrus G16 2024',
+            'Alienware X16 R1',
+            'Razer Blade 14 2024',
+            'ROG Strix G17',
+            'ASUS ROG Strix G18',
+            'ASUS ROG Strix G16',
+            'Razer Blade 16 2024',
+            'Lenovo ThinkPad T14',
+            'Lenovo Yoga 7i 2-in-1',
+            'Lenovo Yoga 9i',
+            'Lenovo Yoga 9i 2-in-1',
+            'ASUS Zenbook Pro 14 OLED',
+          ];
+
+          if (adjustedItems.contains(item['name'])) {
+            imageHeight = 120; // Adjusted height for specific items
           }
 
           return Container(
