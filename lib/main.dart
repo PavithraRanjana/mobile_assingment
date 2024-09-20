@@ -6,24 +6,28 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: EbayHomePage(),
+      home: HomePage(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class EbayHomePage extends StatelessWidget {
+class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // AppBar remains the same
+      // Updated AppBar with rounded logo image
       appBar: AppBar(
-        title: Text('eBay Clone', style: TextStyle(color: Colors.black)),
+        title: Text('Tech Wizard', style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Image.asset('assets/images/ebay_logo.png'), // eBay logo
+          child: CircleAvatar(
+            radius: 20, // Adjust the radius as needed
+            backgroundImage: AssetImage('assets/images/wizard_1.png'),
+            backgroundColor: Colors.transparent, // Optional
+          ),
         ),
         actions: [
           IconButton(
@@ -45,7 +49,7 @@ class EbayHomePage extends StatelessWidget {
                     child: TextField(
                       decoration: InputDecoration(
                         prefixIcon: Icon(Icons.search),
-                        hintText: "Search on eBay",
+                        hintText: "Search on Tech Wizard",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
                           borderSide: BorderSide.none,
@@ -129,19 +133,19 @@ class EbayHomePage extends StatelessWidget {
     List<Map<String, String>> items = [
       {
         'label': 'Laptops',
-        'image': 'assets/images/laptops_image.png',
+        'image': 'assets/images/Lenovo_ThinkPad_T14.png',
       },
       {
         'label': 'Gaming Laptops',
-        'image': 'assets/images/gaming_laptops_image.png',
+        'image': 'assets/images/Razer_Blade_14_2024.jpg',
       },
       {
         'label': 'All-In-One',
-        'image': 'assets/images/all_in_one_image.png',
+        'image': 'assets/images/HP_All-in-One_Desktop_Computer.jpg',
       },
       {
         'label': 'Components',
-        'image': 'assets/images/components_image.png',
+        'image': 'assets/images/intel_core_i9.png',
       },
     ];
 
@@ -272,23 +276,23 @@ class EbayHomePage extends StatelessWidget {
     List<Map<String, String>> brands = [
       {
         'label': 'Lenovo',
-        'image': 'assets/images/lenovo_logo.png',
+        'image': 'assets/images/lenovo.png',
       },
       {
         'label': 'Razer',
-        'image': 'assets/images/razer_logo.png',
+        'image': 'assets/images/razer.png',
       },
       {
         'label': 'Asus',
-        'image': 'assets/images/asus_logo.png',
+        'image': 'assets/images/asus.png',
       },
       {
         'label': 'HP',
-        'image': 'assets/images/hp_logo.png',
+        'image': 'assets/images/hp.png',
       },
       {
         'label': 'Dell',
-        'image': 'assets/images/dell_logo.png',
+        'image': 'assets/images/dell.png',
       },
     ];
 
@@ -321,7 +325,7 @@ class EbayHomePage extends StatelessWidget {
     );
   }
 
-  // Updated Helper to build the laptops section
+  // Helper to build the laptops section
   Widget _buildLaptopsSection() {
     List<Map<String, String>> laptops = [
       {
