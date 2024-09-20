@@ -1,0 +1,78 @@
+import 'package:flutter/material.dart';
+import 'home_screen.dart';
+import 'favorites_screen.dart';
+import 'cart_screen.dart';
+import 'profile_screen.dart';
+
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
+
+  final List<Widget> _screens = [
+    HomeScreen(),       // Your main home screen content
+    FavoritesScreen(),  // Placeholder or actual content
+    CartScreen(),       // Placeholder or actual content
+    ProfileScreen(),    // Placeholder or actual content
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // AppBar remains the same
+      appBar: AppBar(
+        title: Text(
+          'Tech Wizard',
+          style: TextStyle(color: Colors.black),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: CircleAvatar(
+            radius: 20, // Adjust the radius as needed
+            backgroundImage: AssetImage('assets/images/wizard_1.png'),
+            backgroundColor: Colors.transparent, // Optional
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.shopping_cart, color: Colors.black),
+            onPressed: () {},
+          )
+        ],
+      ),
+      body: _screens[_currentIndex], // Display the selected screen
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _currentIndex, // Use _currentIndex here
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Favorites',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'Cart',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+      ),
+    );
+  }
+}
