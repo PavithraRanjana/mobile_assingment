@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'sign_in_screen.dart'; // Import the Sign-In Screen
 
 class ProfileScreen extends StatelessWidget {
-  final String userName = 'Pavithra Ranjana Dissanayaka';
+  final String userName = 'Pavithra Dissanayaka';
   final String userImage = 'assets/images/profile_pic.png';
 
   @override

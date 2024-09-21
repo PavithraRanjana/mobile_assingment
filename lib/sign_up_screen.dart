@@ -1,24 +1,23 @@
-// lib/sign_in_screen.dart
+// lib/sign_up_screen.dart
 
 import 'package:flutter/material.dart';
-import 'package:mobile_assingment/sign_up_screen.dart';
 import 'home_page.dart'; // Import HomePage
+import 'sign_in_screen.dart'; // Import SignInScreen
 
-
-class SignInScreen extends StatelessWidget {
-  final String companyName = 'Tech Wizard';
-  final String companyLogo = 'assets/images/wizard_1.png';
+class SignUpScreen extends StatelessWidget {
+  // You can pass this via constructor or fetch from a provider in future
+  final String companyLogo = 'assets/images/company_logo.png'; // Ensure this asset exists
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Using SingleChildScrollView to prevent overflow on smaller screens
+      // To make the screen scrollable in smaller devices
       body: SingleChildScrollView(
         child: Column(
           children: [
             // Company Logo & Name Section
             Container(
-              height: 500,
+              height: 350,
               width: double.infinity,
               color: Theme.of(context).colorScheme.primary.withOpacity(0.1), // Blue accent background
               child: Column(
@@ -27,13 +26,13 @@ class SignInScreen extends StatelessWidget {
                   // Company Logo
                   Image.asset(
                     companyLogo,
-                    height: 100,
-                    width: 100,
+                    height: 120,
+                    width: 120,
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
                       return Icon(
                         Icons.image_not_supported,
-                        size: 100,
+                        size: 120,
                         color: Colors.grey,
                       );
                     },
@@ -41,7 +40,7 @@ class SignInScreen extends StatelessWidget {
                   SizedBox(height: 20),
                   // Company Name
                   Text(
-                    companyName,
+                    'Tech Wizard',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).colorScheme.primary,
@@ -51,13 +50,35 @@ class SignInScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: 30),
-            // Authentication Form
+            // Registration Form Fields
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
                 children: [
+                  // First Name Field
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText: 'First Name',
+                      prefixIcon: Icon(Icons.person),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  // Last Name Field
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Last Name',
+                      prefixIcon: Icon(Icons.person_outline),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
                   // Email Field
-                  TextFormField(
+                  TextField(
                     decoration: InputDecoration(
                       labelText: 'Email',
                       prefixIcon: Icon(Icons.email),
@@ -69,7 +90,7 @@ class SignInScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 20),
                   // Password Field
-                  TextFormField(
+                  TextField(
                     decoration: InputDecoration(
                       labelText: 'Password',
                       prefixIcon: Icon(Icons.lock),
@@ -80,13 +101,18 @@ class SignInScreen extends StatelessWidget {
                     obscureText: true,
                   ),
                   SizedBox(height: 30),
-                  // Sign In Button
+                  // Create Account Button
                   SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Sign In logic (Functionality not implemented)
+                        // TODO: Implement Create Account functionality
+                        // Navigate to HomePage as placeholder
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomePage()),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
@@ -95,7 +121,7 @@ class SignInScreen extends StatelessWidget {
                         elevation: 5,
                       ),
                       child: Text(
-                        'Sign In',
+                        'Create Account',
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onPrimary,
                           fontWeight: FontWeight.bold,
@@ -104,16 +130,16 @@ class SignInScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 20),
-                  // Create New Account Button
+                  // Sign In Button
                   SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: OutlinedButton(
                       onPressed: () {
-                        // Navigate to sign_up Screen
-                        Navigator.push(
+                        // Navigate to SignInScreen
+                        Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => SignUpScreen()),
+                          MaterialPageRoute(builder: (context) => SignInScreen()),
                         );
                       },
                       style: OutlinedButton.styleFrom(
@@ -126,7 +152,7 @@ class SignInScreen extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        'Create New Account',
+                        'Sign In',
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: Theme.of(context).colorScheme.secondary,
                           fontWeight: FontWeight.bold,
@@ -141,7 +167,7 @@ class SignInScreen extends StatelessWidget {
                     height: 50,
                     child: TextButton(
                       onPressed: () {
-                        // Navigate to HomePage
+                        // Navigate to HomePage as Guest
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => HomePage()),
