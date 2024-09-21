@@ -5,8 +5,7 @@ import 'home_page.dart'; // Import HomePage
 import 'sign_in_screen.dart'; // Import SignInScreen
 
 class SignUpScreen extends StatelessWidget {
-  // You can pass this via constructor or fetch from a provider in future
-  final String companyLogo = 'assets/images/company_logo.png'; // Ensure this asset exists
+  final String companyLogo = 'assets/images/wizard_1.png';
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +16,7 @@ class SignUpScreen extends StatelessWidget {
           children: [
             // Company Logo & Name Section
             Container(
-              height: 350,
+              height: 400,
               width: double.infinity,
               color: Theme.of(context).colorScheme.primary.withOpacity(0.1), // Blue accent background
               child: Column(
@@ -108,7 +107,7 @@ class SignUpScreen extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () {
                         // TODO: Implement Create Account functionality
-                        // Navigate to HomePage as placeholder
+                        // Navigate to HomePage, actual logic in 2nd sem
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => HomePage()),
