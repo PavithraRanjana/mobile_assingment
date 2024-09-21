@@ -1,11 +1,12 @@
 // lib/sign_in_screen.dart
 
 import 'package:flutter/material.dart';
+import 'home_page.dart'; // Import HomePage
+
 
 class SignInScreen extends StatelessWidget {
-  // Sample company data (In a real app, this might come from a configuration or API)
   final String companyName = 'Tech Wizard';
-  final String companyLogo = 'assets/images/wizard_1.png'; // Ensure this asset exists
+  final String companyLogo = 'assets/images/wizard_1.png';
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +136,11 @@ class SignInScreen extends StatelessWidget {
                     height: 50,
                     child: TextButton(
                       onPressed: () {
-                        // Continue as Guest logic (Functionality not implemented)
+                        // Navigate to HomePage
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomePage()),
+                        );
                       },
                       style: TextButton.styleFrom(
                         shape: RoundedRectangleBorder(

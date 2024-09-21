@@ -15,10 +15,11 @@ class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    HomeScreen(),       // Your main home screen content
-    FavoritesScreen(),  // Placeholder or actual content
-    CartScreen(),       // Placeholder or actual content
-    ProfileScreen(),    // Placeholder or actual content
+    HomeScreen(),
+    FavoritesScreen(),
+    CartScreen(),
+    ProfileScreen(),
+
   ];
 
   @override
