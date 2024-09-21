@@ -1,6 +1,7 @@
 // lib/profile_screen.dart
 
 import 'package:flutter/material.dart';
+import 'sign_in_screen.dart'; // Import the Sign-In Screen
 
 class ProfileScreen extends StatelessWidget {
   final String userName = 'Pavithra Ranjana Dissanayaka';
@@ -40,7 +41,7 @@ class ProfileScreen extends StatelessWidget {
                 // User Name
                 Text(
                   userName,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -100,7 +101,11 @@ class ProfileScreen extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      // Sign In logic (Functionality will do in 2nd sem)
+                      // Navigate to Sign-In Screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SignInScreen()),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 15.0),
