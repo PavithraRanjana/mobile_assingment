@@ -1,6 +1,12 @@
+// lib/home_screen.dart
+
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
+  // It's a good practice to dispose of controllers in StatefulWidgets,
+  // but since this is a StatelessWidget and the controller isn't used elsewhere,
+  // it's omitted here. Consider using a StatefulWidget if you plan to manage the controller.
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -15,15 +21,26 @@ class HomeScreen extends StatelessWidget {
                 Expanded(
                   child: TextField(
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.search),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                       hintText: "Search on Tech Wizard",
+                      hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.6),
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide.none,
+                        borderSide: BorderSide.none, // No border by default
                       ),
-                      fillColor: Colors.grey[200],
-                      filled: true,
+                      // Remove the fillColor property to inherit from the theme
+                      // fillColor: Theme.of(context).colorScheme.surface,
+                      filled: true, // Ensure the field is filled
                     ),
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ),
               ],
@@ -34,44 +51,44 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsets.all(10.0),
             child: Text(
               "Product Categories",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
-          _buildCategoriesSection(),
+          _buildCategoriesSection(context),
           // Featured Items Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: _buildSectionHeader(context, "Featured Items"),
           ),
-          _buildFeaturedItemsSection(),
+          _buildFeaturedItemsSection(context),
           // Gaming Laptops Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: _buildSectionHeader(context, "Gaming Laptops"),
           ),
-          _buildGamingLaptopsSection(),
+          _buildGamingLaptopsSection(context),
           // Brands Section
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Text(
               "Our Brands",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
-          _buildBrandsSection(),
+          _buildBrandsSection(context),
           // Laptops Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: _buildSectionHeader(context, "Laptops"),
           ),
-          _buildLaptopsSection(),
+          _buildLaptopsSection(context),
         ],
       ),
     );
   }
 
   // Helper to build the categories section
-  Widget _buildCategoriesSection() {
+  Widget _buildCategoriesSection(BuildContext context) {
     List<Map<String, String>> items = [
       {
         'label': 'Laptops',
@@ -104,11 +121,12 @@ class HomeScreen extends StatelessWidget {
               CircleAvatar(
                 radius: 40,
                 backgroundImage: AssetImage(item['image']!),
+                backgroundColor: Theme.of(context).colorScheme.surface,
               ),
               SizedBox(height: 5),
               Text(
                 item['label']!,
-                style: TextStyle(fontSize: 14),
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
           );
@@ -124,13 +142,17 @@ class HomeScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          Text(title, style: Theme.of(context).textTheme.titleLarge),
           TextButton(
             onPressed: () {
               // Navigate to the full list of items for this section
             },
-            child: Text("See All"),
+            child: Text(
+              "See All",
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
           ),
         ],
       ),
@@ -138,7 +160,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   // Helper to build the featured items section
-  Widget _buildFeaturedItemsSection() {
+  Widget _buildFeaturedItemsSection(BuildContext context) {
     List<Map<String, String>> featuredItems = [
       {
         'name': 'Alienware M18 R2',
@@ -172,11 +194,11 @@ class HomeScreen extends StatelessWidget {
       },
     ];
 
-    return _buildHorizontalListView(featuredItems);
+    return _buildHorizontalListView(context, featuredItems);
   }
 
   // Helper to build the gaming laptops section
-  Widget _buildGamingLaptopsSection() {
+  Widget _buildGamingLaptopsSection(BuildContext context) {
     List<Map<String, String>> gamingLaptops = [
       {
         'name': 'ROG Strix G17',
@@ -210,11 +232,11 @@ class HomeScreen extends StatelessWidget {
       },
     ];
 
-    return _buildHorizontalListView(gamingLaptops);
+    return _buildHorizontalListView(context, gamingLaptops);
   }
 
   // Helper to build the brands section
-  Widget _buildBrandsSection() {
+  Widget _buildBrandsSection(BuildContext context) {
     List<Map<String, String>> brands = [
       {
         'label': 'Lenovo',
@@ -252,11 +274,12 @@ class HomeScreen extends StatelessWidget {
                 CircleAvatar(
                   radius: 40,
                   backgroundImage: AssetImage(brand['image']!),
+                  backgroundColor: Theme.of(context).colorScheme.surface,
                 ),
                 SizedBox(height: 5),
                 Text(
                   brand['label']!,
-                  style: TextStyle(fontSize: 14),
+                  style: Theme.of(context).textTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -268,7 +291,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   // Helper to build the laptops section
-  Widget _buildLaptopsSection() {
+  Widget _buildLaptopsSection(BuildContext context) {
     List<Map<String, String>> laptops = [
       {
         'name': 'Lenovo ThinkPad T14',
@@ -302,11 +325,11 @@ class HomeScreen extends StatelessWidget {
       },
     ];
 
-    return _buildHorizontalListView(laptops);
+    return _buildHorizontalListView(context, laptops);
   }
 
   // General helper to build horizontal list views
-  Widget _buildHorizontalListView(List<Map<String, String>> items) {
+  Widget _buildHorizontalListView(BuildContext context, List<Map<String, String>> items) {
     return Container(
       height: 250, // Adjust the height as needed
       child: ListView.builder(
@@ -355,19 +378,26 @@ class HomeScreen extends StatelessWidget {
                       fit: BoxFit.cover,
                     ),
                     borderRadius: BorderRadius.circular(10),
+                    color: Theme.of(context).colorScheme.surface,
                   ),
                 ),
                 SizedBox(height: 10),
                 // Product Name
                 Text(
                   item['name'] ?? '',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 5),
                 // Product Price
                 Text(
                   item['price'] ?? '',
-                  style: TextStyle(color: Colors.green),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.green,
+                  ),
                 ),
               ],
             ),

@@ -72,6 +72,37 @@ final ThemeData lightTheme = ThemeData(
     ),
   ),
 
+  // InputDecoration theme for TextFields
+  inputDecorationTheme: InputDecorationTheme(
+    filled: true,
+    fillColor: Colors.grey[300], // Light grey fill color
+    prefixIconColor: Colors.grey[600], // Grey color for prefix icons
+    hintStyle: TextStyle(
+      color: Colors.grey[600], // Grey hint text color
+      fontSize: 14,
+    ),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20), // Rounded corners
+      borderSide: BorderSide(
+        color: Colors.grey[300]!, // Light grey border color
+      ),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20), // Rounded corners
+      borderSide: BorderSide(
+        color: Colors.grey[300]!, // Light grey border color
+      ),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20), // Rounded corners
+      borderSide: BorderSide(
+        color: Colors.blueAccent, // Primary color border when focused
+      ),
+    ),
+    // Optional: Adjust content padding for better alignment
+    contentPadding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
+  ),
+
   // Text theme
   textTheme: TextTheme(
     bodyLarge: TextStyle(fontSize: 16.0, color: Colors.black),

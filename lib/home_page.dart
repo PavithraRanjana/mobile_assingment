@@ -1,3 +1,5 @@
+// lib/home_page.dart
+
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'favorites_screen.dart';
@@ -22,14 +24,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // AppBar remains the same
       appBar: AppBar(
-        title: Text(
-          'Tech Wizard',
-          style: TextStyle(color: Colors.black),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
+        title: Text('Tech Wizard'),
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: CircleAvatar(
@@ -40,8 +36,9 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.shopping_cart, color: Colors.black),
+            icon: Icon(Icons.shopping_cart),
             onPressed: () {},
+            // Icon color is managed by the AppBarTheme in the theme files
           )
         ],
       ),
@@ -72,6 +69,7 @@ class _HomePageState extends State<HomePage> {
             label: 'Profile',
           ),
         ],
+        // Colors and styles are managed by the BottomNavigationBarTheme in the theme files
       ),
     );
   }
