@@ -11,6 +11,7 @@ final ThemeData lightTheme = ThemeData(
   colorScheme: ColorScheme.light(
     primary: Colors.blueAccent, // Primary color
     secondary: Colors.orange, // Secondary color
+    tertiary: Colors.green, // Tertiary color for price text
     background: Colors.white, // Background color
     surface: Colors.white, // Surface color (e.g., Card background)
     onPrimary: Colors.white, // Text color on primary

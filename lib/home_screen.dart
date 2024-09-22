@@ -1,6 +1,8 @@
 // lib/home_screen.dart
 
 import 'package:flutter/material.dart';
+// Import ProductDetailScreen when it's ready
+// import 'product_detail_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   // It's a good practice to dispose of controllers in StatefulWidgets,
@@ -145,7 +147,7 @@ class HomeScreen extends StatelessWidget {
           Text(title, style: Theme.of(context).textTheme.titleLarge),
           TextButton(
             onPressed: () {
-              // Navigate to the full list of items for this section
+              // TODO: Implement navigation to see all items for this section
             },
             child: Text(
               "See All",
@@ -363,43 +365,54 @@ class HomeScreen extends StatelessWidget {
             imageHeight = 120; // Adjusted height for specific items
           }
 
-          return Container(
-            width: 160,
-            margin: EdgeInsets.only(left: 10, right: 10, bottom: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Product Image
-                Container(
-                  height: imageHeight,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(item['image']!),
-                      fit: BoxFit.cover,
+          return InkWell(
+            onTap: () {
+              // TODO: Implement navigation to Product Detail Page
+              // Example:
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => ProductDetailScreen()),
+              // );
+            },
+            child: Container(
+              width: 160,
+              margin: EdgeInsets.only(left: 10, right: 10, bottom: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Product Image
+                  Container(
+                    height: imageHeight,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(item['image']!),
+                        fit: BoxFit.cover,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      color: Theme.of(context).colorScheme.surface,
                     ),
-                    borderRadius: BorderRadius.circular(10),
-                    color: Theme.of(context).colorScheme.surface,
                   ),
-                ),
-                SizedBox(height: 10),
-                // Product Name
-                Text(
-                  item['name'] ?? '',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+                  SizedBox(height: 10),
+                  // Product Name
+                  Text(
+                    item['name'] ?? '',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 5),
-                // Product Price
-                Text(
-                  item['price'] ?? '',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.green,
+                  SizedBox(height: 5),
+                  // Product Price
+                  Text(
+                    item['price'] ?? '',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.tertiary,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },

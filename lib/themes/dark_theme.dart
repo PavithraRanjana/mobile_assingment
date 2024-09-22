@@ -11,6 +11,7 @@ final ThemeData darkTheme = ThemeData(
   colorScheme: ColorScheme.dark(
     primary: Colors.blueAccent, // Primary color
     secondary: Colors.deepOrange, // Secondary color
+    tertiary: Colors.green, // Tertiary color for price text
     background: Colors.grey[900]!, // Background color
     surface: Colors.grey[800]!, // Surface color (e.g., Card background)
     onPrimary: Colors.black, // Text color on primary
