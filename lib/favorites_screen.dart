@@ -3,7 +3,9 @@
 import 'package:flutter/material.dart';
 
 class FavoritesScreen extends StatelessWidget {
-  // Sample list of favorite items
+  FavoritesScreen({Key? key}) : super(key: key); // Added Key parameter
+
+  // list of favorite items
   final List<Map<String, String>> favoriteItems = [
     {
       'name': 'Alienware M18 R2',

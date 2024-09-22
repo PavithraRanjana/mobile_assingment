@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 import 'detail_screen.dart'; // Import the updated DetailScreen
 
 class HomeScreen extends StatelessWidget {
-  // It's a good practice to dispose of controllers in StatefulWidgets,
-  // but since this is a StatelessWidget and the controller isn't used elsewhere,
-  // it's omitted here. Consider using a StatefulWidget if you plan to manage the controller.
+  const HomeScreen({Key? key}) : super(key: key); // Added Key parameter
 
   @override
   Widget build(BuildContext context) {

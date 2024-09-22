@@ -15,11 +15,10 @@ class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    HomeScreen(),
-    FavoritesScreen(),
-    CartScreen(),
-    ProfileScreen(),
-
+    HomeScreen(key: ValueKey('Home')),
+    FavoritesScreen(key: ValueKey('Favorites')),
+    CartScreen(key: ValueKey('Cart')),
+    ProfileScreen(key: ValueKey('Profile')),
   ];
 
   @override
@@ -43,14 +42,31 @@ class _HomePageState extends State<HomePage> {
           )
         ],
       ),
-      body: _screens[_currentIndex], // Display the selected screen
+      body: AnimatedSwitcher(
+        duration: Duration(milliseconds: 600),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          // You can choose different transitions here
+          return FadeTransition(child: child, opacity: animation);
+        },
+        child: _screens[_currentIndex],
+        layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
+          return Stack(
+            children: <Widget>[
+              ...previousChildren,
+              if (currentChild != null) currentChild,
+            ],
+          );
+        },
+      ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex, // Use _currentIndex here
         onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
+          if (index != _currentIndex) { // Prevent redundant state updates
+            setState(() {
+              _currentIndex = index;
+            });
+          }
         },
         items: [
           BottomNavigationBarItem(
