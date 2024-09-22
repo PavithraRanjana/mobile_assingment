@@ -18,11 +18,12 @@ class ProfileScreen extends StatelessWidget {
         centerTitle: true,
         // AppBar styling is managed by the theme
       ),
-      body: Column(
+      body: ListView(
+        padding: EdgeInsets.zero,
         children: [
           // User's Name and Image Section
           Container(
-            height: 350,
+            padding: const EdgeInsets.symmetric(vertical: 40.0), // Added vertical padding for spacing
             width: double.infinity,
             color: Theme.of(context).colorScheme.primary.withOpacity(0.1), // Background color from theme
             child: Column(
@@ -50,8 +51,9 @@ class ProfileScreen extends StatelessWidget {
           ),
           SizedBox(height: 20),
           // Profile Options
-          Expanded(
-            child: ListView(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Column(
               children: [
                 ProfileOption(
                   icon: Icons.person,
@@ -91,9 +93,10 @@ class ProfileScreen extends StatelessWidget {
               ],
             ),
           ),
+          SizedBox(height: 30),
           // Action Buttons
           Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Column(
               children: [
                 // Sign In Button
@@ -153,6 +156,7 @@ class ProfileScreen extends StatelessWidget {
               ],
             ),
           ),
+          SizedBox(height: 30), // Extra spacing at the bottom
         ],
       ),
     );
