@@ -1,8 +1,7 @@
 // lib/home_screen.dart
 
 import 'package:flutter/material.dart';
-// Import ProductDetailScreen when it's ready
-// import 'product_detail_screen.dart';
+import 'detail_screen.dart'; // Import the updated DetailScreen
 
 class HomeScreen extends StatelessWidget {
   // It's a good practice to dispose of controllers in StatefulWidgets,
@@ -38,9 +37,8 @@ class HomeScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                         borderSide: BorderSide.none, // No border by default
                       ),
-                      // Remove the fillColor property to inherit from the theme
-                      // fillColor: Theme.of(context).colorScheme.surface,
                       filled: true, // Ensure the field is filled
+                      fillColor: Theme.of(context).colorScheme.surface,
                     ),
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
@@ -367,12 +365,11 @@ class HomeScreen extends StatelessWidget {
 
           return InkWell(
             onTap: () {
-              // TODO: Implement navigation to Product Detail Page
-              // Example:
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => ProductDetailScreen()),
-              // );
+              // Navigate to the DetailScreen when tapped
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DetailScreen()),
+              );
             },
             child: Container(
               width: 160,
