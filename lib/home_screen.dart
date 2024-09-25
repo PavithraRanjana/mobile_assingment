@@ -92,7 +92,7 @@ class HomeScreen extends StatelessWidget {
       },
       {
         'label': 'Gaming Laptops',
-        'image': 'assets/images/Razer_Blade_14_2024.jpg',
+        'image': 'assets/images/ROG_Zephyrus_G16_2024.png',
       },
       {
         'label': 'All-In-One',

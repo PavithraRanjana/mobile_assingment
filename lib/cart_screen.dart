@@ -9,7 +9,7 @@ class CartScreen extends StatelessWidget {
     List<Map<String, dynamic>> cartItems = [
       {
         'name': 'Alienware M18 R2',
-        'image': 'assets/images/Alienware_M18_R2.jpg',
+        'image': 'assets/images/Alienware_M18_R2.png',
         'price': 3499.0,
         'quantity': 1,
       },

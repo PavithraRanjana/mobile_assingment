@@ -1,3 +1,5 @@
+// lib/detail_screen.dart
+
 import 'package:flutter/material.dart';
 
 class DetailScreen extends StatelessWidget {
@@ -34,44 +36,50 @@ class DetailScreen extends StatelessWidget {
           productName,
           style: Theme.of(context).appBarTheme.titleTextStyle,
         ),
+        centerTitle: true, // Centers the AppBar title
         backgroundColor: Theme.of(context).colorScheme.primary,
         elevation: 0,
       ),
-      body: orientation == Orientation.portrait
-          ? _buildPortraitLayout(context, priceColor)
-          : _buildLandscapeLayout(context, priceColor, screenSize),
+      body: SafeArea( // Ensures content doesn't overlap with system UI
+        child: orientation == Orientation.portrait
+            ? _buildPortraitLayout(context, priceColor)
+            : _buildLandscapeLayout(context, priceColor, screenSize),
+      ),
     );
   }
 
-  // Portrait Layout: Image on top with added top padding, details below
+  // Portrait Layout: Image on top with added top and horizontal padding, details below
   Widget _buildPortraitLayout(BuildContext context, Color priceColor) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Added Top Padding to create space between AppBar and Image
+          // Added Top and Horizontal Padding to create space between AppBar and Image
           Padding(
-            padding: const EdgeInsets.only(top: 20.0), // 20 pixels padding
+            padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
             child: Stack(
               children: [
-                // Product Image
-                Image.asset(
-                  productImage,
-                  width: double.infinity,
-                  height: 350, // Increased height to 350
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: double.infinity,
-                      height: 350, // Match the increased height
-                      color: Colors.grey[300],
-                      child: Icon(
-                        Icons.image_not_supported,
-                        size: 100,
-                        color: Colors.grey,
-                      ),
-                    );
-                  },
+                // Product Image with Rounded Corners and Reduced Height
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12.0), // Optional: Rounded corners
+                  child: Image.asset(
+                    productImage,
+                    width: double.infinity,
+                    height: 250, // Reduced height from 350 to 250
+                    fit: BoxFit.contain, // Ensures the entire image fits without cropping
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: double.infinity,
+                        height: 250, // Match the reduced height
+                        color: Colors.grey[300],
+                        child: Icon(
+                          Icons.image_not_supported,
+                          size: 100,
+                          color: Colors.grey,
+                        ),
+                      );
+                    },
+                  ),
                 ),
                 // Favorite Icon
                 Positioned(
@@ -95,7 +103,7 @@ class DetailScreen extends StatelessWidget {
           ),
           // Product Details Section
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -200,6 +208,7 @@ class DetailScreen extends StatelessWidget {
                   description,
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
+                SizedBox(height: 20), // Extra spacing at the bottom
               ],
             ),
           ),
@@ -208,7 +217,7 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
-  // Landscape Layout: Image on the left with increased height, details on the right
+  // Landscape Layout: Image on the left with increased height and margin, details on the right
   Widget _buildLandscapeLayout(
       BuildContext context, Color priceColor, Size screenSize) {
     return SingleChildScrollView(
@@ -222,24 +231,27 @@ class DetailScreen extends StatelessWidget {
               flex: 1,
               child: Stack(
                 children: [
-                  // Product Image
-                  Image.asset(
-                    productImage,
-                    width: double.infinity,
-                    height: screenSize.height * 0.8, // Increased height to 0.8
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: double.infinity,
-                        height: screenSize.height * 0.8, // Match the increased height
-                        color: Colors.grey[300],
-                        child: Icon(
-                          Icons.image_not_supported,
-                          size: 100,
-                          color: Colors.grey,
-                        ),
-                      );
-                    },
+                  // Product Image with Rounded Corners
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12.0), // Optional: Rounded corners
+                    child: Image.asset(
+                      productImage,
+                      width: double.infinity,
+                      height: screenSize.height * 0.6, // Adjusted height for landscape
+                      fit: BoxFit.contain, // Ensures the entire image fits without cropping
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: double.infinity,
+                          height: screenSize.height * 0.6, // Match the adjusted height
+                          color: Colors.grey[300],
+                          child: Icon(
+                            Icons.image_not_supported,
+                            size: 100,
+                            color: Colors.grey,
+                          ),
+                        );
+                      },
+                    ),
                   ),
                   // Favorite Icon
                   Positioned(

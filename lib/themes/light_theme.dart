@@ -29,7 +29,7 @@ final ThemeData lightTheme = ThemeData(
       color: Colors.black, // AppBar icon color
     ),
     titleTextStyle: TextStyle(
-      color: Colors.black, // AppBar title color
+      color: Colors.white, // AppBar title color
       fontSize: 20,
       fontWeight: FontWeight.bold,
     ),
