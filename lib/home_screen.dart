@@ -1,7 +1,5 @@
-// lib/home_screen.dart
-
 import 'package:flutter/material.dart';
-import 'detail_screen.dart'; // Import the updated DetailScreen
+import 'detail_screen.dart'; // Import DetailScreen
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key); // Added Key parameter
@@ -162,7 +160,7 @@ class HomeScreen extends StatelessWidget {
     List<Map<String, String>> featuredItems = [
       {
         'name': 'Alienware M18 R2',
-        'image': 'assets/images/Alienware_M18_R2.jpg',
+        'image': 'assets/images/Alienware_M18_R2.png',
         'price': '\$3499',
       },
       {
@@ -182,12 +180,12 @@ class HomeScreen extends StatelessWidget {
       },
       {
         'name': 'Alienware X16 R1',
-        'image': 'assets/images/Alienware_X16_R1.jpg',
+        'image': 'assets/images/Alienware_X16_R1.png',
         'price': '\$2999',
       },
       {
         'name': 'Razer Blade 14 2024',
-        'image': 'assets/images/Razer_Blade_14_2024.jpg',
+        'image': 'assets/images/Razer_Blade_14_2024.png',
         'price': '\$2299',
       },
     ];
@@ -215,12 +213,12 @@ class HomeScreen extends StatelessWidget {
       },
       {
         'name': 'Alienware X16 R1',
-        'image': 'assets/images/Alienware_X16_R1.jpg',
+        'image': 'assets/images/Alienware_X16_R1.png',
         'price': '\$2999',
       },
       {
-        'name': 'Razer Blade 16 2024',
-        'image': 'assets/images/Razer_Blade_16_2024.jpg',
+        'name': 'Alienware M18 R2',
+        'image': 'assets/images/Alienware_M18_R2.png',
         'price': '\$2599',
       },
       {
@@ -259,12 +257,12 @@ class HomeScreen extends StatelessWidget {
     ];
 
     return Container(
-      height: 120, // Adjust the height as needed
+      height: 120,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: brands.map((brand) {
           return Container(
-            width: 80, // Adjust the width as needed
+            width: 80,
             margin: EdgeInsets.symmetric(horizontal: 10),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -329,13 +327,13 @@ class HomeScreen extends StatelessWidget {
   // General helper to build horizontal list views
   Widget _buildHorizontalListView(BuildContext context, List<Map<String, String>> items) {
     return Container(
-      height: 250, // Adjust the height as needed
+      height: 250,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: items.length,
         itemBuilder: (context, index) {
           final item = items[index];
-          // Adjust image height for specific items if necessary
+
           double imageHeight = 150;
 
           // List of item names with adjusted image height

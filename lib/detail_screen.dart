@@ -1,10 +1,8 @@
-// lib/detail_screen.dart
-
 import 'package:flutter/material.dart';
 
 class DetailScreen extends StatelessWidget {
   // Hardcoded product details
-  final String productImage = 'assets/images/Alienware_M18_R2.jpg';
+  final String productImage = 'assets/images/Alienware_M18_R2.png';
   final String productName = 'Alienware M18 R2';
   final double productPrice = 3499.99;
   final String description =
@@ -60,7 +58,7 @@ class DetailScreen extends StatelessWidget {
                 Image.asset(
                   productImage,
                   width: double.infinity,
-                  height: 350, // Increased height from 300 to 350
+                  height: 350, // Increased height to 350
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
@@ -228,7 +226,7 @@ class DetailScreen extends StatelessWidget {
                   Image.asset(
                     productImage,
                     width: double.infinity,
-                    height: screenSize.height * 0.8, // Increased height from 0.6 to 0.8
+                    height: screenSize.height * 0.8, // Increased height to 0.8
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(

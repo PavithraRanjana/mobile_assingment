@@ -1,5 +1,3 @@
-// lib/themes/dark_theme.dart
-
 import 'package:flutter/material.dart';
 
 final ThemeData darkTheme = ThemeData(
@@ -13,7 +11,7 @@ final ThemeData darkTheme = ThemeData(
     secondary: Colors.deepOrange, // Secondary color
     tertiary: Colors.green, // Tertiary color for price text
     background: Colors.grey[900]!, // Background color
-    surface: Colors.grey[800]!, // Surface color (e.g., Card background)
+    surface: Colors.grey[800]!, // Surface color (used for Card background)
     onPrimary: Colors.black, // Text color on primary
     onSecondary: Colors.black, // Text color on secondary
     onBackground: Colors.white, // Text color on background

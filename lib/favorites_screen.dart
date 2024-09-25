@@ -1,5 +1,3 @@
-// lib/favorites_screen.dart
-
 import 'package:flutter/material.dart';
 
 class FavoritesScreen extends StatelessWidget {
@@ -9,7 +7,7 @@ class FavoritesScreen extends StatelessWidget {
   final List<Map<String, String>> favoriteItems = [
     {
       'name': 'Alienware M18 R2',
-      'image': 'assets/images/Alienware_M18_R2.jpg',
+      'image': 'assets/images/Alienware_M18_R2.png',
       'price': '\$3499',
     },
     {
@@ -29,7 +27,7 @@ class FavoritesScreen extends StatelessWidget {
     },
     {
       'name': 'Razer Blade 14 2024',
-      'image': 'assets/images/Razer_Blade_14_2024.jpg',
+      'image': 'assets/images/Razer_Blade_14_2024.png',
       'price': '\$2299',
     },
     {

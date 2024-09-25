@@ -1,5 +1,3 @@
-// lib/themes/light_theme.dart
-
 import 'package:flutter/material.dart';
 
 final ThemeData lightTheme = ThemeData(
@@ -100,7 +98,7 @@ final ThemeData lightTheme = ThemeData(
         color: Colors.blueAccent, // Primary color border when focused
       ),
     ),
-    // Optional: Adjust content padding for better alignment
+    // Adjusting content padding
     contentPadding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
   ),
 

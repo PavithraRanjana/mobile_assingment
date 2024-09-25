@@ -1,5 +1,3 @@
-// lib/home_page.dart
-
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'favorites_screen.dart';
@@ -29,7 +27,7 @@ class _HomePageState extends State<HomePage> {
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: CircleAvatar(
-            radius: 20, // Adjust the radius as needed
+            radius: 20, // avatar radius
             backgroundImage: AssetImage('assets/images/wizard_1.png'),
             backgroundColor: Colors.transparent, // Optional
           ),
@@ -45,7 +43,7 @@ class _HomePageState extends State<HomePage> {
       body: AnimatedSwitcher(
         duration: Duration(milliseconds: 600),
         transitionBuilder: (Widget child, Animation<double> animation) {
-          // You can choose different transitions here
+          // Fade is the default on android - for screen switching
           return FadeTransition(child: child, opacity: animation);
         },
         child: _screens[_currentIndex],
@@ -60,9 +58,9 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        currentIndex: _currentIndex, // Use _currentIndex here
+        currentIndex: _currentIndex,
         onTap: (index) {
-          if (index != _currentIndex) { // Prevent redundant state updates
+          if (index != _currentIndex) {
             setState(() {
               _currentIndex = index;
             });

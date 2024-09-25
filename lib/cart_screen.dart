@@ -1,5 +1,3 @@
-// lib/cart_screen.dart
-
 import 'package:flutter/material.dart';
 
 class CartScreen extends StatelessWidget {
@@ -12,8 +10,8 @@ class CartScreen extends StatelessWidget {
       {
         'name': 'Alienware M18 R2',
         'image': 'assets/images/Alienware_M18_R2.jpg',
-        'price': 3499.0, // Ensure price is a double
-        'quantity': 1, // Quantity as int
+        'price': 3499.0,
+        'quantity': 1,
       },
       {
         'name': 'ROG Zephyrus G16 2024',
@@ -123,7 +121,7 @@ class CartScreen extends StatelessWidget {
                                 color: Theme.of(context).colorScheme.primary,
                               ),
                               SizedBox(width: 15), // Adjusted spacing
-                              // Item Total Price (Moved Slightly to Left)
+                              // Item Total Price
                               Text(
                                 '\$${itemTotalPrice.toStringAsFixed(2)}',
                                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -234,7 +232,7 @@ class CartScreen extends StatelessWidget {
   }
 }
 
-// Reusable widget for Specification Items (if needed elsewhere)
+// Reusable widget for Specification Items
 class SpecificationItem extends StatelessWidget {
   final String title;
   final String value;
