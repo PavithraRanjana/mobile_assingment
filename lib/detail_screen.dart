@@ -27,7 +27,7 @@ class DetailScreen extends StatelessWidget {
     final Orientation orientation = MediaQuery.of(context).orientation;
     final Size screenSize = MediaQuery.of(context).size;
 
-    // Define the price color consistent with other screens
+    // make the price color consistent with other screens
     final Color priceColor = Theme.of(context).colorScheme.tertiary;
 
     return Scaffold(
@@ -37,7 +37,6 @@ class DetailScreen extends StatelessWidget {
           style: Theme.of(context).appBarTheme.titleTextStyle,
         ),
         centerTitle: true, // Centers the AppBar title
-        backgroundColor: Theme.of(context).colorScheme.primary,
         elevation: 0,
       ),
       body: SafeArea( // Ensures content doesn't overlap with system UI
@@ -48,7 +47,7 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
-  // Portrait Layout: Image on top with added top and horizontal padding, details below
+  // Portrait Layout
   Widget _buildPortraitLayout(BuildContext context, Color priceColor) {
     return SingleChildScrollView(
       child: Column(
@@ -65,8 +64,8 @@ class DetailScreen extends StatelessWidget {
                   child: Image.asset(
                     productImage,
                     width: double.infinity,
-                    height: 250, // Reduced height from 350 to 250
-                    fit: BoxFit.contain, // Ensures the entire image fits without cropping
+                    height: 250,
+                    fit: BoxFit.contain, // make the entire image fits without cropping
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         width: double.infinity,
@@ -87,7 +86,7 @@ class DetailScreen extends StatelessWidget {
                   right: 16,
                   child: GestureDetector(
                     onTap: () {
-                      // Future: Add functionality to add item to favorites
+                      // Add functionality to add item to favorites
                     },
                     child: CircleAvatar(
                       backgroundColor: Colors.white.withOpacity(0.7),
@@ -132,7 +131,7 @@ class DetailScreen extends StatelessWidget {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          // Future: Implement Buy Now functionality
+                          // Implement Buy Now functionality
                         },
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(vertical: 15),
@@ -155,7 +154,7 @@ class DetailScreen extends StatelessWidget {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          // Future: Implement Add to Cart functionality
+                          // Implement Add to Cart functionality
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
@@ -217,7 +216,7 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
-  // Landscape Layout: Image on the left with increased height and margin, details on the right
+  // Landscape Layout
   Widget _buildLandscapeLayout(
       BuildContext context, Color priceColor, Size screenSize) {
     return SingleChildScrollView(
@@ -238,7 +237,7 @@ class DetailScreen extends StatelessWidget {
                       productImage,
                       width: double.infinity,
                       height: screenSize.height * 0.6, // Adjusted height for landscape
-                      fit: BoxFit.contain, // Ensures the entire image fits without cropping
+                      fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           width: double.infinity,
@@ -259,7 +258,7 @@ class DetailScreen extends StatelessWidget {
                     right: 16,
                     child: GestureDetector(
                       onTap: () {
-                        // Future: Add functionality to add item to favorites
+                        // Add functionality to add item to favorites
                       },
                       child: CircleAvatar(
                         backgroundColor: Colors.white.withOpacity(0.7),
@@ -305,7 +304,7 @@ class DetailScreen extends StatelessWidget {
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            // Future: Implement Buy Now functionality
+                            // Implement Buy Now functionality
                           },
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.symmetric(vertical: 15),
@@ -328,7 +327,7 @@ class DetailScreen extends StatelessWidget {
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            // Future: Implement Add to Cart functionality
+                            // Implement Add to Cart functionality
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor:

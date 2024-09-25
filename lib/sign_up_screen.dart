@@ -1,5 +1,3 @@
-// lib/sign_up_screen.dart
-
 import 'package:flutter/material.dart';
 import 'home_page.dart'; // Import HomePage
 import 'sign_in_screen.dart'; // Import SignInScreen
@@ -10,7 +8,7 @@ class SignUpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // To make the screen scrollable in smaller devices
+      // To make the screen scrollable
       body: SingleChildScrollView(
         child: Column(
           children: [

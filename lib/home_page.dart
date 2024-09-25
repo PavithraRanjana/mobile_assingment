@@ -29,13 +29,17 @@ class _HomePageState extends State<HomePage> {
           child: CircleAvatar(
             radius: 20, // avatar radius
             backgroundImage: AssetImage('assets/images/wizard_1.png'),
-            backgroundColor: Colors.transparent, // Optional
+            backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         ),
         actions: [
           IconButton(
             icon: Icon(Icons.shopping_cart),
-            onPressed: () {},
+            onPressed: () {
+              setState(() {
+                _currentIndex = 2; // Navigate to Cart Screen
+              });
+            },
             // Icon color is managed by the AppBarTheme in the theme files
           )
         ],
@@ -43,7 +47,7 @@ class _HomePageState extends State<HomePage> {
       body: AnimatedSwitcher(
         duration: Duration(milliseconds: 600),
         transitionBuilder: (Widget child, Animation<double> animation) {
-          // Fade is the default on android - for screen switching
+          // Fade transition
           return FadeTransition(child: child, opacity: animation);
         },
         child: _screens[_currentIndex],

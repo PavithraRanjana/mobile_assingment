@@ -1,5 +1,3 @@
-// lib/sign_in_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:mobile_assingment/sign_up_screen.dart';
 import 'home_page.dart'; // Import HomePage
@@ -12,7 +10,7 @@ class SignInScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Using SingleChildScrollView to prevent overflow on smaller screens
+      // Using SingleChildScrollView
       body: SingleChildScrollView(
         child: Column(
           children: [

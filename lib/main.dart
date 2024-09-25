@@ -10,7 +10,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  // root widget of the application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: lightTheme, // Light theme
       darkTheme: darkTheme, // Dark theme
-      themeMode: ThemeMode.system, // Use system theme (can be ThemeMode.light or ThemeMode.dark)
+      themeMode: ThemeMode.system, // Use system theme (ThemeMode.light or ThemeMode.dark)
       home: HomePage(),
     );
   }

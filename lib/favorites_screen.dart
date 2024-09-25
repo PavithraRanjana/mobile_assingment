@@ -35,7 +35,7 @@ class FavoritesScreen extends StatelessWidget {
       'image': 'assets/images/ROG_Strix_G17.png',
       'price': '\$1799',
     },
-    // Add more items as needed
+
   ];
 
   @override
@@ -106,7 +106,7 @@ class FavoriteGridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Determine card color based on theme
+    // get the card color from on theme
     final cardColor =
         Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface;
 
@@ -152,7 +152,7 @@ class FavoriteGridItem extends StatelessWidget {
                 right: 8,
                 child: InkWell(
                   onTap: () {
-                    // Remove from favorites logic (not implemented)
+                    // add Remove from favorites logic
                   },
                   child: CircleAvatar(
                     radius: 16,

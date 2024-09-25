@@ -1,4 +1,3 @@
-// lib/profile_screen.dart
 
 import 'package:flutter/material.dart';
 import 'sign_in_screen.dart'; // Import the Sign-In Screen
@@ -11,41 +10,41 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Sample list of profile options
+    // list of profile options
     final List<Map<String, dynamic>> profileOptions = [
       {
         'icon': Icons.person,
         'label': 'Profile',
         'onTap': () {
-          // Navigate to Profile Details (Functionality will be implemented in 2nd sem)
+          // Navigate to Profile Details (Functionality in 2nd sem)
         },
       },
       {
         'icon': Icons.home,
         'label': 'Address',
         'onTap': () {
-          // Navigate to Address Details (Functionality will be implemented in 2nd sem)
+          // Navigate to Address Details (Functionality in 2nd sem)
         },
       },
       {
         'icon': Icons.shopping_bag,
         'label': 'Past Orders',
         'onTap': () {
-          // Navigate to Past Orders (Functionality will be implemented in 2nd sem)
+          // Navigate to Past Orders (Functionality in 2nd sem)
         },
       },
       {
         'icon': Icons.favorite,
         'label': 'Favorites',
         'onTap': () {
-          // Navigate to Favorites (Functionality will be implemented in 2nd sem)
+          // Navigate to Favorites (Functionality in 2nd sem)
         },
       },
       {
         'icon': Icons.payment,
         'label': 'Payment Info',
         'onTap': () {
-          // Navigate to Payment Info (Functionality will be implemented in 2nd sem)
+          // Navigate to Payment Info (Functionality in 2nd sem)
         },
       },
     ];
@@ -148,7 +147,7 @@ class ProfileScreen extends StatelessWidget {
                   width: double.infinity,
                   child: OutlinedButton(
                     onPressed: () {
-                      // Logout logic (Functionality will be implemented in 2nd sem)
+                      // Logout logic (Functionality in 2nd sem)
                     },
                     style: OutlinedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 15.0),
@@ -178,7 +177,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // Portrait Mode: Builds a Column of ProfileOptions
+  // Portrait Mode
   Widget _buildPortraitProfileOptions(
       BuildContext context, List<Map<String, dynamic>> profileOptions) {
     return Column(
@@ -192,17 +191,17 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // Landscape Mode: Builds a Grid of ProfileOptions with 3 items per row
+  // Landscape Mode
   Widget _buildLandscapeProfileOptions(
       BuildContext context, List<Map<String, dynamic>> profileOptions) {
     return GridView.builder(
-      shrinkWrap: true, // Important to prevent unbounded height error
+      shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(), // Prevent GridView from scrolling separately
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3, // 3 items per row
-        crossAxisSpacing: 10.0, // Decreased from 10.0 to 5.0
-        mainAxisSpacing: 10.0, // Decreased from 10.0 to 5.0
-        childAspectRatio: 3.0, // Adjust as needed
+        crossAxisSpacing: 10.0,
+        mainAxisSpacing: 10.0,
+        childAspectRatio: 3.0,
       ),
       itemCount: profileOptions.length,
       itemBuilder: (context, index) {
@@ -272,7 +271,7 @@ class ProfileGridItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        // Decreased internal padding by reducing SizedBox heights and icon size
+
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
           borderRadius: BorderRadius.circular(8.0),
@@ -288,9 +287,9 @@ class ProfileGridItem extends StatelessWidget {
             Icon(
               icon,
               color: Theme.of(context).colorScheme.primary,
-              size: 36, // Decreased from 36 to 32
+              size: 36,
             ),
-            SizedBox(height: 4), // Decreased from 8 to 4
+            SizedBox(height: 4),
             // Label
             Text(
               label,

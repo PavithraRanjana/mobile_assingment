@@ -31,7 +31,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide.none, // No border by default
+                        borderSide: BorderSide.none, // No border
                       ),
                       filled: true, // Ensure the field is filled
                       fillColor: Theme.of(context).colorScheme.surface,

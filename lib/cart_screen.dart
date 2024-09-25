@@ -22,7 +22,6 @@ class CartScreen extends StatelessWidget {
         'price': 1899.0,
         'quantity': 2,
       },
-      // Third item added here
       {
         'name': 'Lenovo ThinkPad T14',
         'image': 'assets/images/Lenovo_ThinkPad_T14.png',
@@ -36,7 +35,7 @@ class CartScreen extends StatelessWidget {
     num totalPrice = 0;
 
     for (var item in cartItems) {
-      // Explicitly cast quantity and price to int and double
+      // cast quantity and price to int and double
       int quantity = item['quantity'] as int;
       double price = item['price'] as double;
 
@@ -44,7 +43,7 @@ class CartScreen extends StatelessWidget {
       totalPrice += price * quantity;
     }
 
-    // Retrieve orientation
+    // get the orientation
     final Orientation orientation = MediaQuery.of(context).orientation;
 
     return Scaffold(
@@ -54,7 +53,6 @@ class CartScreen extends StatelessWidget {
           style: Theme.of(context).appBarTheme.titleTextStyle,
         ),
         centerTitle: true, // Centers the AppBar title
-        backgroundColor: Theme.of(context).colorScheme.primary,
         elevation: 0,
       ),
       body: orientation == Orientation.portrait
@@ -67,6 +65,7 @@ class CartScreen extends StatelessWidget {
   Widget _buildPortraitLayout(BuildContext context, List<Map<String, dynamic>> cartItems,
       num totalItems, num totalPrice) {
     return ListView.builder(
+      padding: EdgeInsets.only(top: 16.0, bottom: 16.0), // Added top and bottom padding
       itemCount: cartItems.length + 1, // Additional item for the bottom section
       itemBuilder: (context, index) {
         if (index < cartItems.length) {
@@ -222,7 +221,7 @@ class CartScreen extends StatelessWidget {
                       // Item Image (Spanning Full Width)
                       Container(
                         width: double.infinity, // Makes image width as much as card's width
-                        height: 120, // Adjusted height accordingly
+                        height: 120,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8.0),
                           image: DecorationImage(
@@ -304,7 +303,7 @@ class CartScreen extends StatelessWidget {
   Widget _buildTotalContainer(BuildContext context, num totalItems, num totalPrice) {
     return Container(
       padding: EdgeInsets.all(16.0),
-      color: Theme.of(context).colorScheme.background.withOpacity(0.1),
+      color: Theme.of(context).colorScheme.surface.withOpacity(0.1),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

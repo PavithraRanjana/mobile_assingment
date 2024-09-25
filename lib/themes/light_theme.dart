@@ -11,7 +11,7 @@ final ThemeData lightTheme = ThemeData(
     secondary: Colors.orange, // Secondary color
     tertiary: Colors.green, // Tertiary color for price text
     background: Colors.white, // Background color
-    surface: Colors.white, // Surface color (e.g., Card background)
+    surface: Colors.white, // Surface color (Card background)
     onPrimary: Colors.white, // Text color on primary
     onSecondary: Colors.white, // Text color on secondary
     onBackground: Colors.black, // Text color on background
@@ -23,7 +23,7 @@ final ThemeData lightTheme = ThemeData(
 
   // AppBar theme
   appBarTheme: AppBarTheme(
-    backgroundColor: Colors.white, // AppBar background color
+    backgroundColor: Colors.blueAccent, // AppBar background color
     elevation: 0, // No shadow
     iconTheme: IconThemeData(
       color: Colors.black, // AppBar icon color

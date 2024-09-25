@@ -11,7 +11,7 @@ final ThemeData darkTheme = ThemeData(
     secondary: Colors.deepOrange, // Secondary color
     tertiary: Colors.green, // Tertiary color for price text
     background: Colors.grey[900]!, // Background color
-    surface: Colors.grey[800]!, // Surface color (used for Card background)
+    surface: Colors.grey[700]!, // Surface color (used for Card background)
     onPrimary: Colors.black, // Text color on primary
     onSecondary: Colors.black, // Text color on secondary
     onBackground: Colors.white, // Text color on background
@@ -23,7 +23,7 @@ final ThemeData darkTheme = ThemeData(
 
   // AppBar theme
   appBarTheme: AppBarTheme(
-    backgroundColor: Colors.grey[900], // AppBar background color
+    backgroundColor: Colors.grey[850], // AppBar background color
     elevation: 0, // No shadow
     iconTheme: IconThemeData(
       color: Colors.white, // AppBar icon color
@@ -49,7 +49,7 @@ final ThemeData darkTheme = ThemeData(
 
   // Card theme
   cardTheme: CardTheme(
-    color: Colors.grey[800], // Card background color
+    color:  Colors.grey[700], // Card background color
     elevation: 2, // Shadow elevation
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(8.0), // Rounded corners
