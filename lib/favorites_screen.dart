@@ -132,7 +132,7 @@ class FavoriteGridItem extends StatelessWidget {
                   image,
                   width: double.infinity,
                   height: 120,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       width: double.infinity,
