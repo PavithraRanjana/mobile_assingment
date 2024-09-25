@@ -1,4 +1,7 @@
+// lib/cart_screen.dart
+
 import 'package:flutter/material.dart';
+import 'dart:math'; // For min function
 
 class CartScreen extends StatelessWidget {
   const CartScreen({Key? key}) : super(key: key); // Added Key parameter
@@ -41,6 +44,9 @@ class CartScreen extends StatelessWidget {
       totalPrice += price * quantity;
     }
 
+    // Retrieve orientation
+    final Orientation orientation = MediaQuery.of(context).orientation;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -48,185 +54,329 @@ class CartScreen extends StatelessWidget {
           style: Theme.of(context).appBarTheme.titleTextStyle,
         ),
         centerTitle: true, // Centers the AppBar title
-        // Colors and styles are managed by the theme
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        elevation: 0,
       ),
-      body: ListView.builder(
-        itemCount: cartItems.length + 1, // Additional item for the bottom section
-        itemBuilder: (context, index) {
-          if (index < cartItems.length) {
-            final item = cartItems[index];
+      body: orientation == Orientation.portrait
+          ? _buildPortraitLayout(context, cartItems, totalItems, totalPrice)
+          : _buildLandscapeLayout(context, cartItems, totalItems, totalPrice),
+    );
+  }
 
-            // Cast quantity and price
-            int quantity = item['quantity'] as int;
-            double price = item['price'] as double;
-            double itemTotalPrice = price * quantity;
+  // Portrait Mode Layout: Vertical List of Cart Items
+  Widget _buildPortraitLayout(BuildContext context, List<Map<String, dynamic>> cartItems,
+      num totalItems, num totalPrice) {
+    return ListView.builder(
+      itemCount: cartItems.length + 1, // Additional item for the bottom section
+      itemBuilder: (context, index) {
+        if (index < cartItems.length) {
+          final item = cartItems[index];
 
-            return Card(
-              margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-              child: Padding(
-                padding: EdgeInsets.all(12.0),
-                child: Row(
-                  children: [
-                    // Item Image (Scaled Down)
-                    Container(
-                      width: 50, // Scaled down width
-                      height: 50, // Scaled down height
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8.0),
-                        image: DecorationImage(
-                          image: AssetImage(item['image']),
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 10),
-                    // Item Details
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Item Name
-                          Text(
-                            item['name'],
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          SizedBox(height: 5),
-                          // Quantity Controls and Price
-                          Row(
-                            children: [
-                              // Decrease Quantity Button
-                              IconButton(
-                                icon: Icon(Icons.remove_circle_outline),
-                                onPressed: () {
-                                  // Decrease quantity logic (not implemented)
-                                },
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                              // Quantity Text
-                              Text(
-                                '$quantity',
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  fontSize: 16,
-                                ),
-                              ),
-                              // Increase Quantity Button
-                              IconButton(
-                                icon: Icon(Icons.add_circle_outline),
-                                onPressed: () {
-                                  // Increase quantity logic (not implemented)
-                                },
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                              SizedBox(width: 15), // Adjusted spacing
-                              // Item Total Price
-                              Text(
-                                '\$${itemTotalPrice.toStringAsFixed(2)}',
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Delete Button
-                    IconButton(
-                      icon: Icon(Icons.delete_outline),
-                      onPressed: () {
-                        // Delete item logic (not implemented)
-                      },
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                  ],
+          // Cast quantity and price
+          int quantity = item['quantity'] as int;
+          double price = item['price'] as double;
+          double itemTotalPrice = price * quantity;
+
+          return _buildPortraitCartItem(context, item, quantity, itemTotalPrice);
+        } else {
+          // Bottom Total Container
+          return _buildTotalContainer(context, totalItems, totalPrice);
+        }
+      },
+    );
+  }
+
+  // Landscape Mode Layout: Grid with 3 Items per Row
+  Widget _buildLandscapeLayout(BuildContext context, List<Map<String, dynamic>> cartItems,
+      num totalItems, num totalPrice) {
+    // Calculate the number of rows needed (3 items per row)
+    int numRows = (cartItems.length / 3).ceil();
+
+    return ListView.builder(
+      itemCount: numRows + 1, // Additional item for the bottom section
+      itemBuilder: (context, index) {
+        if (index < numRows) {
+          // Determine the start and end indices for the current row
+          int startIndex = index * 3;
+          int endIndex = min(startIndex + 3, cartItems.length);
+          List<Map<String, dynamic>> rowItems = cartItems.sublist(startIndex, endIndex);
+
+          return _buildLandscapeCartRow(context, rowItems);
+        } else {
+          // Bottom Total Container
+          return _buildTotalContainer(context, totalItems, totalPrice);
+        }
+      },
+    );
+  }
+
+  // Portrait Mode Cart Item Widget
+  Widget _buildPortraitCartItem(BuildContext context, Map<String, dynamic> item, int quantity,
+      double itemTotalPrice) {
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      child: Padding(
+        padding: EdgeInsets.all(12.0),
+        child: Row(
+          children: [
+            // Item Image (Scaled Down)
+            Container(
+              width: 50, // Scaled down width
+              height: 50, // Scaled down height
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.0),
+                image: DecorationImage(
+                  image: AssetImage(item['image']),
+                  fit: BoxFit.contain,
                 ),
               ),
-            );
-          } else {
-            // Bottom Total Container
-            return Container(
-              padding: EdgeInsets.all(16.0),
-              color: Theme.of(context).colorScheme.background.withOpacity(0.1),
+            ),
+            SizedBox(width: 10),
+            // Item Details
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Total Number of Items
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Total number of items:',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        '$totalItems',
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 5),
-                  // Price
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Price:',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        '\$${totalPrice.toStringAsFixed(2)}',
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 5),
-                  // Total Price
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Total Price:',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        '\$${totalPrice.toStringAsFixed(2)}',
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  // Checkout Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Checkout logic (not implemented)
-                      },
-                      child: Text('Checkout'),
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 15.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        // Colors are managed by the theme's ElevatedButtonThemeData
-                      ),
+                  // Item Name
+                  Text(
+                    item['name'],
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     ),
+                  ),
+                  SizedBox(height: 5),
+                  // Quantity Controls and Price
+                  Row(
+                    children: [
+                      // Decrease Quantity Button
+                      IconButton(
+                        icon: Icon(Icons.remove_circle_outline),
+                        onPressed: () {
+                          // Decrease quantity logic (not implemented)
+                        },
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      // Quantity Text
+                      Text(
+                        '$quantity',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontSize: 16,
+                        ),
+                      ),
+                      // Increase Quantity Button
+                      IconButton(
+                        icon: Icon(Icons.add_circle_outline),
+                        onPressed: () {
+                          // Increase quantity logic (not implemented)
+                        },
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      SizedBox(width: 15), // Adjusted spacing
+                      // Item Total Price
+                      Text(
+                        '\$${itemTotalPrice.toStringAsFixed(2)}',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            );
-          }
-        },
+            ),
+            // Delete Button
+            IconButton(
+              icon: Icon(Icons.delete_outline),
+              onPressed: () {
+                // Delete item logic (not implemented)
+              },
+              color: Theme.of(context).colorScheme.secondary,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Landscape Mode Cart Row Widget: Contains up to 3 Cart Items Side by Side
+  Widget _buildLandscapeCartRow(BuildContext context, List<Map<String, dynamic>> rowItems) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      child: Row(
+        children: rowItems.map((item) {
+          // Cast quantity and price
+          int quantity = item['quantity'] as int;
+          double price = item['price'] as double;
+          double itemTotalPrice = price * quantity;
+
+          return Expanded(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+              child: Card(
+                child: Padding(
+                  padding: EdgeInsets.all(12.0),
+                  child: Column(
+                    children: [
+                      // Item Image (Spanning Full Width)
+                      Container(
+                        width: double.infinity, // Makes image width as much as card's width
+                        height: 120, // Adjusted height accordingly
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
+                          image: DecorationImage(
+                            image: AssetImage(item['image']),
+                            fit: BoxFit.contain, // Use BoxFit.contain
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      // Item Name
+                      Text(
+                        item['name'],
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 10),
+                      // Quantity Controls
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Decrease Quantity Button
+                          IconButton(
+                            icon: Icon(Icons.remove_circle_outline),
+                            onPressed: () {
+                              // Decrease quantity logic (not implemented)
+                            },
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          // Quantity Text
+                          Text(
+                            '$quantity',
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              fontSize: 16,
+                            ),
+                          ),
+                          // Increase Quantity Button
+                          IconButton(
+                            icon: Icon(Icons.add_circle_outline),
+                            onPressed: () {
+                              // Increase quantity logic (not implemented)
+                            },
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 5),
+                      // Delete Button
+                      IconButton(
+                        icon: Icon(Icons.delete_outline),
+                        onPressed: () {
+                          // Delete item logic (not implemented)
+                        },
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                      SizedBox(height: 5),
+                      // Item Total Price
+                      Text(
+                        '\$${itemTotalPrice.toStringAsFixed(2)}',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  // Bottom Total Container Widget
+  Widget _buildTotalContainer(BuildContext context, num totalItems, num totalPrice) {
+    return Container(
+      padding: EdgeInsets.all(16.0),
+      color: Theme.of(context).colorScheme.background.withOpacity(0.1),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Total Number of Items
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total number of items:',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                '$totalItems',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ],
+          ),
+          SizedBox(height: 5),
+          // Price
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Price:',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                '\$${totalPrice.toStringAsFixed(2)}',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ],
+          ),
+          SizedBox(height: 5),
+          // Total Price
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total Price:',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                '\$${totalPrice.toStringAsFixed(2)}',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
+          // Checkout Button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                // Checkout logic (not implemented)
+              },
+              child: Text('Checkout'),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 15.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                // Colors are managed by the theme's ElevatedButtonThemeData
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
