@@ -34,7 +34,7 @@ final ThemeData lightTheme = ThemeData(
       fontWeight: FontWeight.bold,
     ),
     actionsIconTheme: IconThemeData(
-      color: Colors.black, // AppBar actions icon color
+      color: Colors.white, // AppBar actions icon color
     ),
   ),
 
