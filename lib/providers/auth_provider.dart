@@ -14,11 +14,13 @@ class AuthProvider with ChangeNotifier {
   AuthStatus _status = AuthStatus.unauthenticated;
   String? _token;
   String? _errorMessage;
+  String? _userName;
 
   // Getters
   AuthStatus get status => _status;
   String? get token => _token;
   String? get errorMessage => _errorMessage;
+  String? get userName => _userName;
   bool get isAuthenticated => _status == AuthStatus.authenticated;
 
   // Clear error message
@@ -48,7 +50,8 @@ class AuthProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        _token = data['token']; // Assuming the API returns a token
+        _token = data['token'];
+        _userName = data['user']['name']; // Store user name from response
         _status = AuthStatus.authenticated;
         notifyListeners();
         return true;
@@ -67,7 +70,7 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  // Register user
+  // Register method
   Future<bool> register({
     required String name,
     required String email,
@@ -92,7 +95,8 @@ class AuthProvider with ChangeNotifier {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
-        _token = data['token']; // Assuming the API returns a token
+        _token = data['token'];
+        _userName = name; // Store user name from registration
         _status = AuthStatus.authenticated;
         notifyListeners();
         return true;
@@ -111,10 +115,10 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-
   // Logout
   void logout() {
     _token = null;
+    _userName = null;
     _status = AuthStatus.unauthenticated;
     notifyListeners();
   }
