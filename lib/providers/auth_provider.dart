@@ -27,6 +27,46 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // Login method
+  Future<bool> login({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      _status = AuthStatus.authenticating;
+      _errorMessage = null;
+      notifyListeners();
+
+      final response = await http.post(
+        Uri.parse('https://techwizard-7z3ua.ondigitalocean.app/api/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email,
+          'password': password,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        _token = data['token']; // Assuming the API returns a token
+        _status = AuthStatus.authenticated;
+        notifyListeners();
+        return true;
+      } else {
+        final data = jsonDecode(response.body);
+        _errorMessage = data['message'] ?? 'Login failed';
+        _status = AuthStatus.unauthenticated;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = 'Network error occurred';
+      _status = AuthStatus.unauthenticated;
+      notifyListeners();
+      return false;
+    }
+  }
+
   // Register user
   Future<bool> register({
     required String name,
@@ -70,6 +110,7 @@ class AuthProvider with ChangeNotifier {
       return false;
     }
   }
+
 
   // Logout
   void logout() {
