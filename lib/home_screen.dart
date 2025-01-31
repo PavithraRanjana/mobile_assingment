@@ -1,8 +1,25 @@
 import 'package:flutter/material.dart';
-import 'detail_screen.dart'; // Import DetailScreen
+import 'package:provider/provider.dart';
+import 'detail_screen.dart';
+import '../providers/category_provider.dart';
+import 'category_products_screen.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key); // Added Key parameter
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch categories when screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<CategoryProvider>(context, listen: false).fetchCategories();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +48,9 @@ class HomeScreen extends StatelessWidget {
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide.none, // No border
+                        borderSide: BorderSide.none,
                       ),
-                      filled: true, // Ensure the field is filled
+                      filled: true,
                       fillColor: Theme.of(context).colorScheme.surface,
                     ),
                     style: Theme.of(context).textTheme.bodyLarge,
@@ -42,7 +59,8 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
           ),
-          // Product Categories Section
+
+          // Categories Section
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Text(
@@ -50,19 +68,22 @@ class HomeScreen extends StatelessWidget {
               style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
-          _buildCategoriesSection(context),
+          _buildCategoriesSection(),
+
           // Featured Items Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: _buildSectionHeader(context, "Featured Items"),
           ),
           _buildFeaturedItemsSection(context),
+
           // Gaming Laptops Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: _buildSectionHeader(context, "Gaming Laptops"),
           ),
           _buildGamingLaptopsSection(context),
+
           // Brands Section
           Padding(
             padding: const EdgeInsets.all(10.0),
@@ -72,6 +93,7 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           _buildBrandsSection(context),
+
           // Laptops Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -83,51 +105,111 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // Helper to build the categories section
-  Widget _buildCategoriesSection(BuildContext context) {
-    List<Map<String, String>> items = [
-      {
-        'label': 'Laptops',
-        'image': 'assets/images/Lenovo_ThinkPad_T14.png',
-      },
-      {
-        'label': 'Gaming Laptops',
-        'image': 'assets/images/ROG_Zephyrus_G16_2024.png',
-      },
-      {
-        'label': 'All-In-One',
-        'image': 'assets/images/HP_All-in-One_Desktop_Computer.jpg',
-      },
-      {
-        'label': 'Components',
-        'image': 'assets/images/intel_core_i9.png',
-      },
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Wrap(
-        spacing: 20,
-        runSpacing: 20,
-        alignment: WrapAlignment.center,
-        children: items.map((item) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircleAvatar(
-                radius: 40,
-                backgroundImage: AssetImage(item['image']!),
-                backgroundColor: Theme.of(context).colorScheme.surface,
-              ),
-              SizedBox(height: 5),
-              Text(
-                item['label']!,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
+  Widget _buildCategoriesSection() {
+    return Consumer<CategoryProvider>(
+      builder: (context, categoryProvider, child) {
+        if (categoryProvider.isLoading) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: CircularProgressIndicator(),
+            ),
           );
-        }).toList(),
-      ),
+        }
+
+        if (categoryProvider.error != null) {
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(categoryProvider.error!),
+                ElevatedButton(
+                  onPressed: () => categoryProvider.fetchCategories(),
+                  child: Text('Retry'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            children: categoryProvider.categories.map((category) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CategoryProductsScreen(
+                          categorySlug: category.slug,
+                          categoryName: category.name,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Theme.of(context).colorScheme.surface,
+                        ),
+                        child: ClipOval(
+                          child: FittedBox(
+                            fit: BoxFit.contain,
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              child: Image.network(
+                                'https://techwizard-7z3ua.ondigitalocean.app${category.image}',
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Icon(
+                                    Icons.category,
+                                    size: 40,
+                                    color: Theme.of(context).colorScheme.primary,
+                                  );
+                                },
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      value: loadingProgress.expectedTotalBytes != null
+                                          ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                          : null,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      SizedBox(
+                        width: 80,
+                        child: Text(
+                          category.name,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        );
+      },
     );
   }
 
@@ -327,89 +409,85 @@ class HomeScreen extends StatelessWidget {
   // General helper to build horizontal list views
   Widget _buildHorizontalListView(BuildContext context, List<Map<String, String>> items) {
     return Container(
-      height: 250,
-      child: ListView.builder(
+        height: 250,
+        child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: items.length,
         itemBuilder: (context, index) {
-          final item = items[index];
+      final item = items[index];
 
-          double imageHeight = 150;
+      double imageHeight = 150;
 
-          // List of item names with adjusted image height
-          List<String> adjustedItems = [
-            'Alienware M18 R2',
-            'Alienware X15 R1',
-            'ROG Strix G15 2022 G513',
-            'ROG Zephyrus G16 2024',
-            'Alienware X16 R1',
-            'Razer Blade 14 2024',
-            'ROG Strix G17',
-            'ASUS ROG Strix G18',
-            'ASUS ROG Strix G16',
-            'Razer Blade 16 2024',
-            'Lenovo ThinkPad T14',
-            'Lenovo Yoga 7i 2-in-1',
-            'Lenovo Yoga 9i',
-            'Lenovo Yoga 9i 2-in-1',
-            'ASUS Zenbook Pro 14 OLED',
-          ];
+      // List of item names with adjusted image height
+      List<String> adjustedItems = [
+        'Alienware M18 R2',
+        'Alienware X15 R1',
+        'ROG Strix G15 2022 G513',
+        'ROG Zephyrus G16 2024',
+        'Alienware X16 R1',
+        'Razer Blade 14 2024',
+        'ROG Strix G17',
+        'ASUS ROG Strix G18',
+        'ASUS ROG Strix G16',
+        'Razer Blade 16 2024',
+        'Lenovo ThinkPad T14',
+        'Lenovo Yoga 7i 2-in-1',
+        'Lenovo Yoga 9i',
+        'Lenovo Yoga 9i 2-in-1',
+        'ASUS Zenbook Pro 14 OLED',
+      ];
 
-          if (adjustedItems.contains(item['name'])) {
-            imageHeight = 120; // Adjusted height for specific items
-          }
+      if (adjustedItems.contains(item['name'])) {
+        imageHeight = 120;
+      }
 
-          return InkWell(
-            onTap: () {
-              // Navigate to the DetailScreen when tapped
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DetailScreen()),
-              );
-            },
-            child: Container(
-              width: 160,
-              margin: EdgeInsets.only(left: 10, right: 10, bottom: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Product Image
-                  Container(
-                    height: imageHeight,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage(item['image']!),
-                        fit: BoxFit.contain,
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                      color: Theme.of(context).colorScheme.surface,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  // Product Name
-                  Text(
-                    item['name'] ?? '',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 5),
-                  // Product Price
-                  Text(
-                    item['price'] ?? '',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.tertiary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
+      return InkWell(
+          onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => DetailScreen()),
+        );
+      },
+    child: Container(
+    width: 160,
+    margin: EdgeInsets.only(left: 10, right: 10, bottom: 20),
+    child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+    Container(
+    height: imageHeight,
+    decoration: BoxDecoration(
+    image: DecorationImage(
+    image: AssetImage(item['image']!),
+    fit: BoxFit.contain,
+    ),
+    borderRadius: BorderRadius.circular(10),
+    color: Theme.of(context).colorScheme.surface,
+    ),
+    ),
+    SizedBox(height: 10),
+    Text(
+    item['name'] ?? '',
+      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+        fontWeight: FontWeight.bold,
       ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    ),
+      SizedBox(height: 5),
+      Text(
+        item['price'] ?? '',
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          color: Theme.of(context).colorScheme.tertiary,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ],
+    ),
+    ),
+      );
+        },
+        ),
     );
   }
 }

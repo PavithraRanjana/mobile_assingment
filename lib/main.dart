@@ -1,6 +1,7 @@
 // lib/main.dart
 
 import 'package:flutter/material.dart';
+import 'package:mobile_assingment/providers/category_provider.dart';
 import 'package:provider/provider.dart';
 import 'home_page.dart';
 import 'providers/auth_provider.dart';
@@ -13,6 +14,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => CategoryProvider()),
         // Add other providers here as needed
       ],
       child: MyApp(),
