@@ -18,6 +18,10 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isLoadingLaptops = false;
   String? laptopError;
 
+  List<dynamic>? desktopProducts;
+  bool isLoadingDesktops = false;
+  String? desktopError;
+
   @override
   void initState() {
     super.initState();
@@ -25,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Provider.of<CategoryProvider>(context, listen: false).fetchCategories();
       Provider.of<BrandProvider>(context, listen: false).fetchBrands();
       _fetchLaptops();
+      _fetchDesktops();
     });
   }
 
@@ -35,8 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     try {
-      final categoryProvider =
-          Provider.of<CategoryProvider>(context, listen: false);
+      final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
       final category = await categoryProvider.fetchCategoryBySlug('laptops');
 
       if (category != null) {
@@ -54,6 +58,35 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         laptopError = 'Error loading laptops';
         isLoadingLaptops = false;
+      });
+    }
+  }
+
+  Future<void> _fetchDesktops() async {
+    setState(() {
+      isLoadingDesktops = true;
+      desktopError = null;
+    });
+
+    try {
+      final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
+      final category = await categoryProvider.fetchCategoryBySlug('desktops');
+
+      if (category != null) {
+        setState(() {
+          desktopProducts = categoryProvider.categoryProducts?.take(6).toList();
+          isLoadingDesktops = false;
+        });
+      } else {
+        setState(() {
+          desktopError = 'Failed to load desktops';
+          isLoadingDesktops = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        desktopError = 'Error loading desktops';
+        isLoadingDesktops = false;
       });
     }
   }
@@ -77,13 +110,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                       hintText: "Search on Tech Wizard",
-                      hintStyle:
-                          Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurface
-                                    .withOpacity(0.6),
-                              ),
+                      hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),
                         borderSide: BorderSide.none,
@@ -111,17 +140,16 @@ class _HomeScreenState extends State<HomeScreen> {
           // Laptops Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: _buildSectionHeader(context, "Laptops",
-                categorySlug: 'laptops'),
+            child: _buildSectionHeader(context, "Laptops", categorySlug: 'laptops'),
           ),
           _buildLaptopsSection(context),
 
-          // Gaming Laptops Section
+          // Desktops Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: _buildSectionHeader(context, "Gaming Laptops"),
+            child: _buildSectionHeader(context, "Desktops", categorySlug: 'desktops'),
           ),
-          _buildGamingLaptopsSection(context),
+          _buildDesktopsSection(context),
 
           // Brands Section
           Padding(
@@ -204,23 +232,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                   return Icon(
                                     Icons.category,
                                     size: 40,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                                    color: Theme.of(context).colorScheme.primary,
                                   );
                                 },
-                                loadingBuilder:
-                                    (context, child, loadingProgress) {
+                                loadingBuilder: (context, child, loadingProgress) {
                                   if (loadingProgress == null) return child;
                                   return Center(
                                     child: CircularProgressIndicator(
-                                      value:
-                                          loadingProgress.expectedTotalBytes !=
-                                                  null
-                                              ? loadingProgress
-                                                      .cumulativeBytesLoaded /
-                                                  loadingProgress
-                                                      .expectedTotalBytes!
-                                              : null,
+                                      value: loadingProgress.expectedTotalBytes != null
+                                          ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                          : null,
                                     ),
                                   );
                                 },
@@ -251,8 +273,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, String title,
-      {String? categorySlug}) {
+  Widget _buildSectionHeader(BuildContext context, String title, {String? categorySlug}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Row(
@@ -260,24 +281,22 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Text(title, style: Theme.of(context).textTheme.titleLarge),
           TextButton(
-            onPressed: categorySlug != null
-                ? () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CategoryProductsScreen(
-                          categorySlug: categorySlug,
-                          categoryName: title,
-                        ),
-                      ),
-                    );
-                  }
-                : null,
+            onPressed: categorySlug != null ? () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CategoryProductsScreen(
+                    categorySlug: categorySlug,
+                    categoryName: title,
+                  ),
+                ),
+              );
+            } : null,
             child: Text(
               "See All",
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
+                color: Theme.of(context).colorScheme.primary,
+              ),
             ),
           ),
         ],
@@ -350,8 +369,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(
                     product['name'] ?? '',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -359,9 +378,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(
                     '\$${_getDefaultPrice(product['variants'])}',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.tertiary,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      color: Theme.of(context).colorScheme.tertiary,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -372,45 +391,96 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildGamingLaptopsSection(BuildContext context) {
-    List<Map<String, String>> gamingLaptops = [
-      {
-        'name': 'ROG Strix G17',
-        'image': 'assets/images/ROG_Strix_G17.png',
-        'price': '\$1799',
-      },
-      {
-        'name': 'ASUS ROG Strix G18',
-        'image': 'assets/images/ASUS_ROG_Strix_G18.png',
-        'price': '\$1899',
-      },
-      {
-        'name': 'ASUS ROG Strix G16',
-        'image': 'assets/images/ASUS_ROG_Strix_G16.png',
-        'price': '\$1699',
-      },
-      {
-        'name': 'Alienware X16 R1',
-        'image': 'assets/images/Alienware_X16_R1.png',
-        'price': '\$2999',
-      },
-      {
-        'name': 'Alienware M18 R2',
-        'image': 'assets/images/Alienware_M18_R2.png',
-        'price': '\$2599',
-      },
-      {
-        'name': 'ROG Strix G15 2022 G513',
-        'image': 'assets/images/ROG_Strix_G15_2022_G513.png',
-        'price': '\$1599',
-      },
-    ];
+  Widget _buildDesktopsSection(BuildContext context) {
+    if (isLoadingDesktops) {
+      return Container(
+        height: 250,
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
 
-    return _buildHorizontalListView(context, gamingLaptops);
+    if (desktopError != null) {
+      return Container(
+        height: 250,
+        child: Center(
+          child: Text(desktopError!),
+        ),
+      );
+    }
+
+    if (desktopProducts == null || desktopProducts!.isEmpty) {
+      return Container(
+        height: 250,
+        child: Center(
+          child: Text('No desktops available'),
+        ),
+      );
+    }
+
+    return Container(
+      height: 250,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: desktopProducts!.length,
+        itemBuilder: (context, index) {
+          final product = desktopProducts![index];
+          return InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DetailScreen()),
+              );
+            },
+            child: Container(
+              width: 160,
+              margin: EdgeInsets.only(left: 10, right: 10, bottom: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 120,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: NetworkImage(
+                          'https://techwizard-7z3ua.ondigitalocean.app${product['images']['primary']}',
+                        ),
+                        fit: BoxFit.contain,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      color: Theme.of(context).colorScheme.surface,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    product['name'] ?? '',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    '\$${_getDefaultPrice(product['variants'])}',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.tertiary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   Widget _buildBrandsSection(BuildContext context) {
-    return Consumer<BrandProvider>(builder: (context, brandProvider, child) {
+    return Consumer<BrandProvider>(
+        builder: (context, brandProvider, child) {
       if (brandProvider.isLoading) {
         return Container(
           height: 120,
@@ -422,13 +492,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (brandProvider.error != null) {
         return Container(
-          height: 120,
-          child: Center(
-            child: Text(
+            height: 120,
+            child: Center(child: Text(
               brandProvider.error!,
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
-          ),
+            ),
         );
       }
 
@@ -491,95 +560,13 @@ class _HomeScreenState extends State<HomeScreen> {
           },
         ),
       );
-    });
-  }
-
-  Widget _buildHorizontalListView(
-      BuildContext context, List<Map<String, String>> items) {
-    return Container(
-      height: 250,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          final item = items[index];
-          double imageHeight = 150;
-
-          List<String> adjustedItems = [
-            'Alienware M18 R2',
-            'Alienware X15 R1',
-            'ROG Strix G15 2022 G513',
-            'ROG Zephyrus G16 2024',
-            'Alienware X16 R1',
-            'Razer Blade 14 2024',
-            'ROG Strix G17',
-            'ASUS ROG Strix G18',
-            'ASUS ROG Strix G16',
-            'Razer Blade 16 2024',
-            'Lenovo ThinkPad T14',
-            'Lenovo Yoga 7i 2-in-1',
-            'Lenovo Yoga 9i',
-            'Lenovo Yoga 9i 2-in-1',
-            'ASUS Zenbook Pro 14 OLED',
-          ];
-
-          if (adjustedItems.contains(item['name'])) {
-            imageHeight = 120;
-          }
-
-          return InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DetailScreen()),
-              );
-            },
-            child: Container(
-              width: 160,
-              margin: EdgeInsets.only(left: 10, right: 10, bottom: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    height: imageHeight,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage(item['image']!),
-                        fit: BoxFit.contain,
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                      color: Theme.of(context).colorScheme.surface,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    item['name'] ?? '',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    item['price'] ?? '',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.tertiary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                ],
-              ),
-            ),
-          );
         },
-      ),
     );
   }
 
   String _getDefaultPrice(List<dynamic> variants) {
     final defaultVariant = variants.firstWhere(
-      (variant) => variant['is_default'] == true,
+          (variant) => variant['is_default'] == true,
       orElse: () => variants.first,
     );
     return defaultVariant['price']['current'];
