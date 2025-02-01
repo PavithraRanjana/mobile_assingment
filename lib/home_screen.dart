@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_assingment/providers/brand_provider.dart';
 import 'package:provider/provider.dart';
 import 'detail_screen.dart';
 import '../providers/category_provider.dart';
@@ -18,6 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Fetch categories when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<CategoryProvider>(context, listen: false).fetchCategories();
+      Provider.of<BrandProvider>(context, listen: false).fetchBrands();
     });
   }
 
@@ -313,58 +315,79 @@ class _HomeScreenState extends State<HomeScreen> {
     return _buildHorizontalListView(context, gamingLaptops);
   }
 
-  // Helper to build the brands section
-  Widget _buildBrandsSection(BuildContext context) {
-    List<Map<String, String>> brands = [
-      {
-        'label': 'Lenovo',
-        'image': 'assets/images/lenovo.png',
-      },
-      {
-        'label': 'Razer',
-        'image': 'assets/images/razer.png',
-      },
-      {
-        'label': 'Asus',
-        'image': 'assets/images/asus.png',
-      },
-      {
-        'label': 'HP',
-        'image': 'assets/images/hp.png',
-      },
-      {
-        'label': 'Dell',
-        'image': 'assets/images/dell.png',
-      },
-    ];
+// Update the _buildBrandsSection method in home_screen.dart
 
-    return Container(
-      height: 120,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: brands.map((brand) {
+  Widget _buildBrandsSection(BuildContext context) {
+    return Consumer<BrandProvider>(
+      builder: (context, brandProvider, child) {
+        if (brandProvider.isLoading) {
           return Container(
-            width: 80,
-            margin: EdgeInsets.symmetric(horizontal: 10),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundImage: AssetImage(brand['image']!),
-                  backgroundColor: Theme.of(context).colorScheme.surface,
-                ),
-                SizedBox(height: 5),
-                Text(
-                  brand['label']!,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-              ],
+            height: 120,
+            child: Center(
+              child: CircularProgressIndicator(),
             ),
           );
-        }).toList(),
-      ),
+        }
+
+        if (brandProvider.error != null) {
+          return Container(
+            height: 120,
+            child: Center(
+              child: Text(
+                brandProvider.error!,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ),
+          );
+        }
+
+        return Container(
+          height: 120,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: brandProvider.brands.length,
+            itemBuilder: (context, index) {
+              final brand = brandProvider.brands[index];
+              return Container(
+                width: 80,
+                margin: EdgeInsets.symmetric(horizontal: 10),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Theme.of(context).colorScheme.surface,
+                      child: ClipOval(
+                        child: Image.network(
+                          'https://techwizard-7z3ua.ondigitalocean.app${brand.logo}',
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.business,
+                              size: 40,
+                              color: Theme.of(context).colorScheme.primary,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      brand.name,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
