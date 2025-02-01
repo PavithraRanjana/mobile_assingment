@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_assingment/providers/brand_provider.dart';
 import 'package:provider/provider.dart';
+import '../providers/brand_provider.dart';
+import '../providers/category_provider.dart';
 import 'brand_details_screen.dart';
 import 'detail_screen.dart';
-import '../providers/category_provider.dart';
 import 'category_products_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -14,14 +14,48 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  List<dynamic>? laptopProducts;
+  bool isLoadingLaptops = false;
+  String? laptopError;
+
   @override
   void initState() {
     super.initState();
-    // Fetch categories when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<CategoryProvider>(context, listen: false).fetchCategories();
       Provider.of<BrandProvider>(context, listen: false).fetchBrands();
+      _fetchLaptops();
     });
+  }
+
+  Future<void> _fetchLaptops() async {
+    setState(() {
+      isLoadingLaptops = true;
+      laptopError = null;
+    });
+
+    try {
+      final categoryProvider =
+          Provider.of<CategoryProvider>(context, listen: false);
+      final category = await categoryProvider.fetchCategoryBySlug('laptops');
+
+      if (category != null) {
+        setState(() {
+          laptopProducts = categoryProvider.categoryProducts?.take(6).toList();
+          isLoadingLaptops = false;
+        });
+      } else {
+        setState(() {
+          laptopError = 'Failed to load laptops';
+          isLoadingLaptops = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        laptopError = 'Error loading laptops';
+        isLoadingLaptops = false;
+      });
+    }
   }
 
   @override
@@ -43,12 +77,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                       hintText: "Search on Tech Wizard",
-                      hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withOpacity(0.6),
-                      ),
+                      hintStyle:
+                          Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withOpacity(0.6),
+                              ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),
                         borderSide: BorderSide.none,
@@ -73,12 +108,13 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           _buildCategoriesSection(),
 
-          // Featured Items Section
+          // Laptops Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: _buildSectionHeader(context, "Featured Items"),
+            child: _buildSectionHeader(context, "Laptops",
+                categorySlug: 'laptops'),
           ),
-          _buildFeaturedItemsSection(context),
+          _buildLaptopsSection(context),
 
           // Gaming Laptops Section
           Padding(
@@ -96,13 +132,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           _buildBrandsSection(context),
-
-          // Laptops Section
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: _buildSectionHeader(context, "Laptops"),
-          ),
-          _buildLaptopsSection(context),
         ],
       ),
     );
@@ -175,17 +204,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                   return Icon(
                                     Icons.category,
                                     size: 40,
-                                    color: Theme.of(context).colorScheme.primary,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                   );
                                 },
-                                loadingBuilder: (context, child, loadingProgress) {
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
                                   if (loadingProgress == null) return child;
                                   return Center(
                                     child: CircularProgressIndicator(
-                                      value: loadingProgress.expectedTotalBytes != null
-                                          ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                          : null,
+                                      value:
+                                          loadingProgress.expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
                                     ),
                                   );
                                 },
@@ -216,8 +251,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Helper to build section headers with "See All" button
-  Widget _buildSectionHeader(BuildContext context, String title) {
+  Widget _buildSectionHeader(BuildContext context, String title,
+      {String? categorySlug}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Row(
@@ -225,14 +260,24 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Text(title, style: Theme.of(context).textTheme.titleLarge),
           TextButton(
-            onPressed: () {
-              // TODO: Implement navigation to see all items for this section
-            },
+            onPressed: categorySlug != null
+                ? () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CategoryProductsScreen(
+                          categorySlug: categorySlug,
+                          categoryName: title,
+                        ),
+                      ),
+                    );
+                  }
+                : null,
             child: Text(
               "See All",
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-              ),
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
             ),
           ),
         ],
@@ -240,45 +285,93 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Helper to build the featured items section
-  Widget _buildFeaturedItemsSection(BuildContext context) {
-    List<Map<String, String>> featuredItems = [
-      {
-        'name': 'Alienware M18 R2',
-        'image': 'assets/images/Alienware_M18_R2.png',
-        'price': '\$3499',
-      },
-      {
-        'name': 'Alienware X15 R1',
-        'image': 'assets/images/Alienware_X15R1.png',
-        'price': '\$2499',
-      },
-      {
-        'name': 'ROG Strix G15 2022 G513',
-        'image': 'assets/images/ROG_Strix_G15_2022_G513.png',
-        'price': '\$1599',
-      },
-      {
-        'name': 'ROG Zephyrus G16 2024',
-        'image': 'assets/images/ROG_Zephyrus_G16_2024.png',
-        'price': '\$1899',
-      },
-      {
-        'name': 'Alienware X16 R1',
-        'image': 'assets/images/Alienware_X16_R1.png',
-        'price': '\$2999',
-      },
-      {
-        'name': 'Razer Blade 14 2024',
-        'image': 'assets/images/Razer_Blade_14_2024.png',
-        'price': '\$2299',
-      },
-    ];
+  Widget _buildLaptopsSection(BuildContext context) {
+    if (isLoadingLaptops) {
+      return Container(
+        height: 250,
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
 
-    return _buildHorizontalListView(context, featuredItems);
+    if (laptopError != null) {
+      return Container(
+        height: 250,
+        child: Center(
+          child: Text(laptopError!),
+        ),
+      );
+    }
+
+    if (laptopProducts == null || laptopProducts!.isEmpty) {
+      return Container(
+        height: 250,
+        child: Center(
+          child: Text('No laptops available'),
+        ),
+      );
+    }
+
+    return Container(
+      height: 250,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: laptopProducts!.length,
+        itemBuilder: (context, index) {
+          final product = laptopProducts![index];
+          return InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DetailScreen()),
+              );
+            },
+            child: Container(
+              width: 160,
+              margin: EdgeInsets.only(left: 10, right: 10, bottom: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 120,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: NetworkImage(
+                          'https://techwizard-7z3ua.ondigitalocean.app${product['images']['primary']}',
+                        ),
+                        fit: BoxFit.contain,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      color: Theme.of(context).colorScheme.surface,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    product['name'] ?? '',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    '\$${_getDefaultPrice(product['variants'])}',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.tertiary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 
-  // Helper to build the gaming laptops section
   Widget _buildGamingLaptopsSection(BuildContext context) {
     List<Map<String, String>> gamingLaptops = [
       {
@@ -317,212 +410,178 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildBrandsSection(BuildContext context) {
-    return Consumer<BrandProvider>(
-      builder: (context, brandProvider, child) {
-        if (brandProvider.isLoading) {
-          return Container(
-            height: 120,
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
-
-        if (brandProvider.error != null) {
-          return Container(
-            height: 120,
-            child: Center(
-              child: Text(
-                brandProvider.error!,
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
-            ),
-          );
-        }
-
+    return Consumer<BrandProvider>(builder: (context, brandProvider, child) {
+      if (brandProvider.isLoading) {
         return Container(
           height: 120,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: brandProvider.brands.length,
-            itemBuilder: (context, index) {
-              final brand = brandProvider.brands[index];
-              return Container(
-                width: 80,
-                margin: EdgeInsets.symmetric(horizontal: 10),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => BrandDetailsScreen(
-                          brandSlug: brand.slug,
-                          brandName: brand.name,
-                        ),
-                      ),
-                    );
-                  },
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundColor: Theme.of(context).colorScheme.surface,
-                        child: ClipOval(
-                          child: Image.network(
-                            'https://techwizard-7z3ua.ondigitalocean.app${brand.logo}',
-                            width: 80,
-                            height: 80,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Icon(
-                                Icons.business,
-                                size: 40,
-                                color: Theme.of(context).colorScheme.primary,
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        brand.name,
-                        style: Theme.of(context).textTheme.bodyMedium,
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
+          child: Center(
+            child: CircularProgressIndicator(),
           ),
         );
-      },
-    );
-  }
+      }
 
-  // Helper to build the laptops section
-  Widget _buildLaptopsSection(BuildContext context) {
-    List<Map<String, String>> laptops = [
-      {
-        'name': 'Lenovo ThinkPad T14',
-        'image': 'assets/images/Lenovo_ThinkPad_T14.png',
-        'price': '\$1199',
-      },
-      {
-        'name': 'Lenovo Yoga 7i 2-in-1',
-        'image': 'assets/images/Lenovo_Yoga_7i_2-in-1.png',
-        'price': '\$999',
-      },
-      {
-        'name': 'Lenovo Yoga 9i',
-        'image': 'assets/images/Lenovo_Yoga_9i.png',
-        'price': '\$1299',
-      },
-      {
-        'name': 'Lenovo Yoga 9i 2-in-1',
-        'image': 'assets/images/Lenovo_Yoga_9i_2-in-1.png',
-        'price': '\$1399',
-      },
-      {
-        'name': 'ASUS Zenbook Pro 14 OLED',
-        'image': 'assets/images/ASUS_Zenbook_Pro_14_OLED.png',
-        'price': '\$1499',
-      },
-      {
-        'name': 'ROG Strix G17',
-        'image': 'assets/images/ROG_Strix_G17.png',
-        'price': '\$1799',
-      },
-    ];
+      if (brandProvider.error != null) {
+        return Container(
+          height: 120,
+          child: Center(
+            child: Text(
+              brandProvider.error!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+          ),
+        );
+      }
 
-    return _buildHorizontalListView(context, laptops);
-  }
-
-  // General helper to build horizontal list views
-  Widget _buildHorizontalListView(BuildContext context, List<Map<String, String>> items) {
-    return Container(
-        height: 250,
+      return Container(
+        height: 120,
         child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: brandProvider.brands.length,
+          itemBuilder: (context, index) {
+            final brand = brandProvider.brands[index];
+            return Container(
+              width: 80,
+              margin: EdgeInsets.symmetric(horizontal: 10),
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BrandDetailsScreen(
+                        brandSlug: brand.slug,
+                        brandName: brand.name,
+                      ),
+                    ),
+                  );
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Theme.of(context).colorScheme.surface,
+                      child: ClipOval(
+                        child: Image.network(
+                          'https://techwizard-7z3ua.ondigitalocean.app${brand.logo}',
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.business,
+                              size: 40,
+                              color: Theme.of(context).colorScheme.primary,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      brand.name,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    });
+  }
+
+  Widget _buildHorizontalListView(
+      BuildContext context, List<Map<String, String>> items) {
+    return Container(
+      height: 250,
+      child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: items.length,
         itemBuilder: (context, index) {
-      final item = items[index];
+          final item = items[index];
+          double imageHeight = 150;
 
-      double imageHeight = 150;
+          List<String> adjustedItems = [
+            'Alienware M18 R2',
+            'Alienware X15 R1',
+            'ROG Strix G15 2022 G513',
+            'ROG Zephyrus G16 2024',
+            'Alienware X16 R1',
+            'Razer Blade 14 2024',
+            'ROG Strix G17',
+            'ASUS ROG Strix G18',
+            'ASUS ROG Strix G16',
+            'Razer Blade 16 2024',
+            'Lenovo ThinkPad T14',
+            'Lenovo Yoga 7i 2-in-1',
+            'Lenovo Yoga 9i',
+            'Lenovo Yoga 9i 2-in-1',
+            'ASUS Zenbook Pro 14 OLED',
+          ];
 
-      // List of item names with adjusted image height
-      List<String> adjustedItems = [
-        'Alienware M18 R2',
-        'Alienware X15 R1',
-        'ROG Strix G15 2022 G513',
-        'ROG Zephyrus G16 2024',
-        'Alienware X16 R1',
-        'Razer Blade 14 2024',
-        'ROG Strix G17',
-        'ASUS ROG Strix G18',
-        'ASUS ROG Strix G16',
-        'Razer Blade 16 2024',
-        'Lenovo ThinkPad T14',
-        'Lenovo Yoga 7i 2-in-1',
-        'Lenovo Yoga 9i',
-        'Lenovo Yoga 9i 2-in-1',
-        'ASUS Zenbook Pro 14 OLED',
-      ];
+          if (adjustedItems.contains(item['name'])) {
+            imageHeight = 120;
+          }
 
-      if (adjustedItems.contains(item['name'])) {
-        imageHeight = 120;
-      }
-
-      return InkWell(
-          onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => DetailScreen()),
-        );
-      },
-    child: Container(
-    width: 160,
-    margin: EdgeInsets.only(left: 10, right: 10, bottom: 20),
-    child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-    Container(
-    height: imageHeight,
-    decoration: BoxDecoration(
-    image: DecorationImage(
-    image: AssetImage(item['image']!),
-    fit: BoxFit.contain,
-    ),
-    borderRadius: BorderRadius.circular(10),
-    color: Theme.of(context).colorScheme.surface,
-    ),
-    ),
-    SizedBox(height: 10),
-    Text(
-    item['name'] ?? '',
-      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-        fontWeight: FontWeight.bold,
-      ),
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-    ),
-      SizedBox(height: 5),
-      Text(
-        item['price'] ?? '',
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-          color: Theme.of(context).colorScheme.tertiary,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    ],
-    ),
-    ),
-      );
+          return InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DetailScreen()),
+              );
+            },
+            child: Container(
+              width: 160,
+              margin: EdgeInsets.only(left: 10, right: 10, bottom: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: imageHeight,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(item['image']!),
+                        fit: BoxFit.contain,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      color: Theme.of(context).colorScheme.surface,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    item['name'] ?? '',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    item['price'] ?? '',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.tertiary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          );
         },
-        ),
+      ),
     );
+  }
+
+  String _getDefaultPrice(List<dynamic> variants) {
+    final defaultVariant = variants.firstWhere(
+      (variant) => variant['is_default'] == true,
+      orElse: () => variants.first,
+    );
+    return defaultVariant['price']['current'];
   }
 }
