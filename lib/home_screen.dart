@@ -22,6 +22,10 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isLoadingDesktops = false;
   String? desktopError;
 
+  List<dynamic>? accessoryProducts;
+  bool isLoadingAccessories = false;
+  String? accessoryError;
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Provider.of<BrandProvider>(context, listen: false).fetchBrands();
       _fetchLaptops();
       _fetchDesktops();
+      _fetchAccessories();
     });
   }
 
@@ -58,6 +63,35 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         laptopError = 'Error loading laptops';
         isLoadingLaptops = false;
+      });
+    }
+  }
+
+  Future<void> _fetchAccessories() async {
+    setState(() {
+      isLoadingAccessories = true;
+      accessoryError = null;
+    });
+
+    try {
+      final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
+      final category = await categoryProvider.fetchCategoryBySlug('accessories');
+
+      if (category != null) {
+        setState(() {
+          accessoryProducts = categoryProvider.categoryProducts?.take(6).toList();
+          isLoadingAccessories = false;
+        });
+      } else {
+        setState(() {
+          accessoryError = 'Failed to load accessories';
+          isLoadingAccessories = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        accessoryError = 'Error loading accessories';
+        isLoadingAccessories = false;
       });
     }
   }
@@ -151,6 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           _buildDesktopsSection(context),
 
+
           // Brands Section
           Padding(
             padding: const EdgeInsets.all(10.0),
@@ -160,6 +195,15 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           _buildBrandsSection(context),
+
+          // Accessories Section
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: _buildSectionHeader(context, "Accessories", categorySlug: 'accessories'),
+          ),
+          _buildAccessoriesSection(context),
+
+
         ],
       ),
     );
@@ -420,12 +464,98 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return Container(
-      height: 250,
-      child: ListView.builder(
+        height: 250,
+        child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: desktopProducts!.length,
         itemBuilder: (context, index) {
-          final product = desktopProducts![index];
+      final product = desktopProducts![index];
+      return InkWell(
+          onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => DetailScreen()),
+        );
+      },
+    child: Container(
+    width: 160,
+    margin: EdgeInsets.only(left: 10, right: 10, bottom: 20),
+    child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+    Container(
+    height: 120,
+    decoration: BoxDecoration(
+    image: DecorationImage(
+    image: NetworkImage(
+    'https://techwizard-7z3ua.ondigitalocean.app${product['images']['primary']}',
+    ),
+    fit: BoxFit.contain,
+    ),
+    borderRadius: BorderRadius.circular(10),
+    color: Theme.of(context).colorScheme.surface,
+    ),
+    ),
+    SizedBox(height: 10),
+    Text(
+    product['name'] ?? '',style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+      fontWeight: FontWeight.bold,
+    ),
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+    ),
+      SizedBox(height: 5),
+      Text(
+        '\$${_getDefaultPrice(product['variants'])}',
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          color: Theme.of(context).colorScheme.tertiary,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ],
+    ),
+    ),
+      );
+        },
+        ),
+    );
+  }
+
+  Widget _buildAccessoriesSection(BuildContext context) {
+    if (isLoadingAccessories) {
+      return Container(
+        height: 250,
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (accessoryError != null) {
+      return Container(
+        height: 250,
+        child: Center(
+          child: Text(accessoryError!),
+        ),
+      );
+    }
+
+    if (accessoryProducts == null || accessoryProducts!.isEmpty) {
+      return Container(
+        height: 250,
+        child: Center(
+          child: Text('No accessories available'),
+        ),
+      );
+    }
+
+    return Container(
+      height: 250,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: accessoryProducts!.length,
+        itemBuilder: (context, index) {
+          final product = accessoryProducts![index];
           return InkWell(
             onTap: () {
               Navigator.push(
@@ -480,87 +610,88 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildBrandsSection(BuildContext context) {
     return Consumer<BrandProvider>(
-        builder: (context, brandProvider, child) {
-      if (brandProvider.isLoading) {
+      builder: (context, brandProvider, child) {
+        if (brandProvider.isLoading) {
+          return Container(
+            height: 120,
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        if (brandProvider.error != null) {
+          return Container(
+            height: 120,
+            child: Center(
+              child: Text(
+                brandProvider.error!,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ),
+          );
+        }
+
         return Container(
           height: 120,
-          child: Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
-      }
-
-      if (brandProvider.error != null) {
-        return Container(
-            height: 120,
-            child: Center(child: Text(
-              brandProvider.error!,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-            ),
-        );
-      }
-
-      return Container(
-        height: 120,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: brandProvider.brands.length,
-          itemBuilder: (context, index) {
-            final brand = brandProvider.brands[index];
-            return Container(
-              width: 80,
-              margin: EdgeInsets.symmetric(horizontal: 10),
-              child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => BrandDetailsScreen(
-                        brandSlug: brand.slug,
-                        brandName: brand.name,
-                      ),
-                    ),
-                  );
-                },
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: Theme.of(context).colorScheme.surface,
-                      child: ClipOval(
-                        child: Image.network(
-                          'https://techwizard-7z3ua.ondigitalocean.app${brand.logo}',
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Icon(
-                              Icons.business,
-                              size: 40,
-                              color: Theme.of(context).colorScheme.primary,
-                            );
-                          },
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: brandProvider.brands.length,
+            itemBuilder: (context, index) {
+              final brand = brandProvider.brands[index];
+              return Container(
+                width: 80,
+                margin: EdgeInsets.symmetric(horizontal: 10),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BrandDetailsScreen(
+                          brandSlug: brand.slug,
+                          brandName: brand.name,
                         ),
                       ),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      brand.name,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                    );
+                  },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircleAvatar(
+                        radius: 40,
+                        backgroundColor: Theme.of(context).colorScheme.surface,
+                        child: ClipOval(
+                          child: Image.network(
+                            'https://techwizard-7z3ua.ondigitalocean.app${brand.logo}',
+                            width: 80,
+                            height: 80,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(
+                                Icons.business,
+                                size: 40,
+                                color: Theme.of(context).colorScheme.primary,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Text(
+                        brand.name,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
-        ),
-      );
-        },
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
