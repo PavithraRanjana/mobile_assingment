@@ -42,6 +42,22 @@ class BrandProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
+  Future<Map<String, dynamic>> fetchBrandDetails(String slug) async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://techwizard-7z3ua.ondigitalocean.app/api/brands/$slug'),
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        throw Exception('Failed to load brand details');
+      }
+    } catch (e) {
+      throw Exception('Network error occurred: ${e.toString()}');
+    }
+  }
+
   Future<void> fetchBrands() async {
     _isLoading = true;
     _error = null;

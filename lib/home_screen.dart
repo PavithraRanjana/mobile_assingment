@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_assingment/providers/brand_provider.dart';
 import 'package:provider/provider.dart';
+import 'brand_details_screen.dart';
 import 'detail_screen.dart';
 import '../providers/category_provider.dart';
 import 'category_products_screen.dart';
@@ -315,8 +316,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return _buildHorizontalListView(context, gamingLaptops);
   }
 
-// Update the _buildBrandsSection method in home_screen.dart
-
   Widget _buildBrandsSection(BuildContext context) {
     return Consumer<BrandProvider>(
       builder: (context, brandProvider, child) {
@@ -351,37 +350,50 @@ class _HomeScreenState extends State<HomeScreen> {
               return Container(
                 width: 80,
                 margin: EdgeInsets.symmetric(horizontal: 10),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: Theme.of(context).colorScheme.surface,
-                      child: ClipOval(
-                        child: Image.network(
-                          'https://techwizard-7z3ua.ondigitalocean.app${brand.logo}',
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Icon(
-                              Icons.business,
-                              size: 40,
-                              color: Theme.of(context).colorScheme.primary,
-                            );
-                          },
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BrandDetailsScreen(
+                          brandSlug: brand.slug,
+                          brandName: brand.name,
                         ),
                       ),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      brand.name,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                    );
+                  },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircleAvatar(
+                        radius: 40,
+                        backgroundColor: Theme.of(context).colorScheme.surface,
+                        child: ClipOval(
+                          child: Image.network(
+                            'https://techwizard-7z3ua.ondigitalocean.app${brand.logo}',
+                            width: 80,
+                            height: 80,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(
+                                Icons.business,
+                                size: 40,
+                                color: Theme.of(context).colorScheme.primary,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Text(
+                        brand.name,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
