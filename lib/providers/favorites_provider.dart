@@ -115,16 +115,19 @@ class FavoritesProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> removeFromFavorites(String favoriteId, String? token) async {
+  Future<bool> removeFromFavorites(String productId, String? token) async {
     if (token == null) return false;
 
     try {
       final response = await http.delete(
-        Uri.parse('https://techwizard-7z3ua.ondigitalocean.app/api/wishlist/$favoriteId'),
+        Uri.parse('https://techwizard-7z3ua.ondigitalocean.app/api/wishlist/remove'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
+        body: json.encode({
+          'product_id': productId,
+        }),
       );
 
       if (response.statusCode == 200) {

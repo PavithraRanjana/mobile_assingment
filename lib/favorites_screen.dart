@@ -111,7 +111,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   return FavoriteGridItem(
                     favoriteItem: item,
                     onRemove: () async {
-                      await favorites.removeFromFavorites(item.id, auth.token);
+                      await favorites.removeFromFavorites(item.productId, auth.token);
                     },
                   );
                 },
