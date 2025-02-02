@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_assingment/providers/brand_provider.dart';
 import 'package:mobile_assingment/providers/category_provider.dart';
+import 'package:mobile_assingment/providers/product_provider.dart';  // Add this import
 import 'package:provider/provider.dart';
 import 'home_page.dart';
 import 'providers/auth_provider.dart';
@@ -17,7 +18,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
         ChangeNotifierProvider(create: (_) => BrandProvider()),
-        // Add other providers here as needed
+        ChangeNotifierProvider(create: (_) => ProductProvider()),  // Add this provider
       ],
       child: MyApp(),
     ),

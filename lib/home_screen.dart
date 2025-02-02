@@ -387,7 +387,11 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => DetailScreen()),
+                MaterialPageRoute(
+                  builder: (context) => DetailScreen(
+                    productSlug: product['slug'],
+                  ),
+                ),
               );
             },
             child: Container(
@@ -472,10 +476,14 @@ class _HomeScreenState extends State<HomeScreen> {
       final product = desktopProducts![index];
       return InkWell(
           onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => DetailScreen()),
-        );
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DetailScreen(
+                  productSlug: product['slug'],
+                ),
+              ),
+            );
       },
     child: Container(
     width: 160,
@@ -560,7 +568,11 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => DetailScreen()),
+                MaterialPageRoute(
+                  builder: (context) => DetailScreen(
+                    productSlug: product['slug'],
+                  ),
+                ),
               );
             },
             child: Container(

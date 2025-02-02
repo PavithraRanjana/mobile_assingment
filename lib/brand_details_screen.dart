@@ -183,7 +183,9 @@ class _BrandDetailsScreenState extends State<BrandDetailsScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => DetailScreen(),
+            builder: (context) => DetailScreen(
+              productSlug: product['slug'],
+            ),
           ),
         );
       },

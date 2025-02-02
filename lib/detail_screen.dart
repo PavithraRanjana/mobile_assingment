@@ -1,429 +1,217 @@
-// lib/detail_screen.dart
+// lib/screens/detail_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/product_provider.dart';
 
-class DetailScreen extends StatelessWidget {
-  // Hardcoded product details
-  final String productImage = 'assets/images/Alienware_M18_R2.png';
-  final String productName = 'Alienware M18 R2';
-  final double productPrice = 3499.99;
-  final String description =
-      'COMMANDING POWER & PRESENCE: Outplay your rivals and show them who\'s boss with an 18-inch gaming laptop featuring 14th Gen Intel Core i9-14900HX processor and NVIDIA GeForce RTX 4080 12 GB GDDR6 graphics. Play your most demanding games with up to 270W Total Power Performance* with more headroom to support overclocking without throttling';
-  final Map<String, String> specifications = {
-    'Processor': 'Intel Core i9-11900K',
-    'GPU': 'NVIDIA GeForce RTX 4090',
-    'RAM': '32GB DDR4',
-    'SSD': '1TB NVMe',
-    'Screen Size': '18-inch QHD',
-    'Brand': 'Dell',
-    'Category': 'Gaming Laptop',
-  };
+class DetailScreen extends StatefulWidget {
+  final String productSlug;
 
-  DetailScreen({Key? key}) : super(key: key);
+  const DetailScreen({
+    Key? key,
+    required this.productSlug,
+  }) : super(key: key);
+
+  @override
+  _DetailScreenState createState() => _DetailScreenState();
+}
+
+class _DetailScreenState extends State<DetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<ProductProvider>(context, listen: false)
+          .fetchProductBySlug(widget.productSlug);
+    });
+  }
+
+  String _getDefaultPrice(List<dynamic> variants) {
+    final defaultVariant = variants.firstWhere(
+          (variant) => variant['is_default'] == true,
+      orElse: () => variants.first,
+    );
+    return defaultVariant['price']['current'];
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Retrieve orientation and screen size
-    final Orientation orientation = MediaQuery.of(context).orientation;
-    final Size screenSize = MediaQuery.of(context).size;
+    return Consumer<ProductProvider>(
+      builder: (context, provider, child) {
+        if (provider.isLoading) {
+          return Scaffold(
+            appBar: AppBar(),
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
 
-    // make the price color consistent with other screens
-    final Color priceColor = Theme.of(context).colorScheme.tertiary;
+        if (provider.error != null) {
+          return Scaffold(
+            appBar: AppBar(),
+            body: Center(child: Text(provider.error!)),
+          );
+        }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          productName,
-          style: Theme.of(context).appBarTheme.titleTextStyle,
-        ),
-        centerTitle: true, // Centers the AppBar title
-        elevation: 0,
-      ),
-      body: SafeArea( // Ensures content doesn't overlap with system UI
-        child: orientation == Orientation.portrait
-            ? _buildPortraitLayout(context, priceColor)
-            : _buildLandscapeLayout(context, priceColor, screenSize),
-      ),
-    );
-  }
+        final product = provider.productDetails;
+        if (product == null) {
+          return Scaffold(
+            appBar: AppBar(),
+            body: Center(child: Text('Product not found')),
+          );
+        }
 
-  // Portrait Layout
-  Widget _buildPortraitLayout(BuildContext context, Color priceColor) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Added Top and Horizontal Padding to create space between AppBar and Image
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
-            child: Stack(
-              children: [
-                // Product Image with Rounded Corners and Reduced Height
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12.0), // Optional: Rounded corners
-                  child: Image.asset(
-                    productImage,
-                    width: double.infinity,
-                    height: 250,
-                    fit: BoxFit.contain, // make the entire image fits without cropping
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: double.infinity,
-                        height: 250, // Match the reduced height
-                        color: Colors.grey[300],
-                        child: Icon(
-                          Icons.image_not_supported,
-                          size: 100,
-                          color: Colors.grey,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                // Favorite Icon
-                Positioned(
-                  bottom: 16,
-                  right: 16,
-                  child: GestureDetector(
-                    onTap: () {
-                      // Add functionality to add item to favorites
-                    },
-                    child: CircleAvatar(
-                      backgroundColor: Colors.white.withOpacity(0.7),
-                      child: Icon(
-                        Icons.favorite_border,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(
+              product['name'],
+              style: Theme.of(context).appBarTheme.titleTextStyle,
             ),
+            centerTitle: true,
           ),
-          // Product Details Section
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          body: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Product Name
-                Text(
-                  productName,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 8),
-                // Price
-                Text(
-                  '\$${productPrice.toStringAsFixed(2)}',
-                  style: TextStyle(
-                    color: priceColor,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 16),
-                // Buy Now and Add to Cart Buttons
-                Row(
+                // Product Image with Favorite Icon
+                Stack(
                   children: [
-                    // Buy Now Button
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Implement Buy Now functionality
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          // Colors are managed by the theme's ElevatedButtonThemeData
-                        ),
-                        child: Text(
-                          'Buy Now',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                    Container(
+                      width: double.infinity,
+                      height: 300,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                      ),
+                      child: Image.network(
+                        'https://techwizard-7z3ua.ondigitalocean.app${product['images']['primary']}',
+                        fit: BoxFit.contain,
                       ),
                     ),
-                    SizedBox(width: 16),
-                    // Add to Cart Button
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Implement Add to Cart functionality
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                          Theme.of(context).colorScheme.secondary, // Uses theme's secondary color
-                          padding: EdgeInsets.symmetric(vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
+                    Positioned(
+                      top: 16,
+                      right: 16,
+                      child: CircleAvatar(
+                        backgroundColor: Colors.white.withOpacity(0.9),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.favorite_border,
+                            color: Colors.red,
                           ),
-                        ),
-                        child: Text(
-                          'Add to Cart',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          onPressed: () {
+                            // Add to favorites logic
+                          },
                         ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 24),
-                // Product Specifications
-                Text(
-                  'Specifications',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Product Name
+                      Text(
+                        product['name'],
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+
+                      // Price
+                      Text(
+                        '\$${_getDefaultPrice(product['variants'])}',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.tertiary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 24),
+
+                      // Action Buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                // Buy Now logic
+                              },
+                              child: Text('Buy Now'),
+                              style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 16),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                // Add to Cart logic
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context).colorScheme.secondary,
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                              ),
+                              child: Text('Add to Cart'),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 24),
+
+                      // Specifications
+                      Text(
+                        'Specifications',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      ...product['base_configuration'].entries.map((entry) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  '${entry.key}:',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 3,
+                                child: Text(entry.value.toString()),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      SizedBox(height: 24),
+
+                      // Description
+                      Text(
+                        'Description',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        product['description'],
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      SizedBox(height: 16),
+                    ],
                   ),
                 ),
-                SizedBox(height: 8),
-                // Specifications List
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: specifications.entries.map((entry) {
-                    return SpecificationItem(
-                      title: entry.key,
-                      value: entry.value,
-                    );
-                  }).toList(),
-                ),
-                SizedBox(height: 24),
-                // Description
-                Text(
-                  'Description',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  description,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                SizedBox(height: 20), // Extra spacing at the bottom
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  // Landscape Layout
-  Widget _buildLandscapeLayout(
-      BuildContext context, Color priceColor, Size screenSize) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Product Image with Favorite Icon Overlay
-            Expanded(
-              flex: 1,
-              child: Stack(
-                children: [
-                  // Product Image with Rounded Corners
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12.0), // Optional: Rounded corners
-                    child: Image.asset(
-                      productImage,
-                      width: double.infinity,
-                      height: screenSize.height * 0.6, // Adjusted height for landscape
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          width: double.infinity,
-                          height: screenSize.height * 0.6, // Match the adjusted height
-                          color: Colors.grey[300],
-                          child: Icon(
-                            Icons.image_not_supported,
-                            size: 100,
-                            color: Colors.grey,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  // Favorite Icon
-                  Positioned(
-                    bottom: 16,
-                    right: 16,
-                    child: GestureDetector(
-                      onTap: () {
-                        // Add functionality to add item to favorites
-                      },
-                      child: CircleAvatar(
-                        backgroundColor: Colors.white.withOpacity(0.7),
-                        child: Icon(
-                          Icons.favorite_border,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(width: 20),
-            // Product Details Section
-            Expanded(
-              flex: 1,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Product Name
-                  Text(
-                    productName,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  // Price
-                  Text(
-                    '\$${productPrice.toStringAsFixed(2)}',
-                    style: TextStyle(
-                      color: priceColor,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  // Buy Now and Add to Cart Buttons
-                  Row(
-                    children: [
-                      // Buy Now Button
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // Implement Buy Now functionality
-                          },
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            // Colors are managed by the theme's ElevatedButtonThemeData
-                          ),
-                          child: Text(
-                            'Buy Now',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 16),
-                      // Add to Cart Button
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // Implement Add to Cart functionality
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                            Theme.of(context).colorScheme.secondary, // Uses theme's secondary color
-                            padding: EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                          ),
-                          child: Text(
-                            'Add to Cart',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 24),
-                  // Product Specifications
-                  Text(
-                    'Specifications',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  // Specifications List
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: specifications.entries.map((entry) {
-                      return SpecificationItem(
-                        title: entry.key,
-                        value: entry.value,
-                      );
-                    }).toList(),
-                  ),
-                  SizedBox(height: 24),
-                  // Description
-                  Text(
-                    'Description',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    description,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// SpecificationItem Widget for displaying key-value pairs
-class SpecificationItem extends StatelessWidget {
-  final String title;
-  final String value;
-
-  const SpecificationItem({
-    Key? key,
-    required this.title,
-    required this.value,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        children: [
-          // Specification Title
-          Expanded(
-            flex: 2,
-            child: Text(
-              '$title:',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          // Specification Value
-          Expanded(
-            flex: 3,
-            child: Text(value),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
