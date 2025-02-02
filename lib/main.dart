@@ -3,7 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_assingment/providers/brand_provider.dart';
 import 'package:mobile_assingment/providers/category_provider.dart';
-import 'package:mobile_assingment/providers/product_provider.dart';  // Add this import
+import 'package:mobile_assingment/providers/product_provider.dart';
+import 'package:mobile_assingment/providers/favorites_provider.dart';
 import 'package:provider/provider.dart';
 import 'home_page.dart';
 import 'providers/auth_provider.dart';
@@ -18,7 +19,8 @@ void main() {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
         ChangeNotifierProvider(create: (_) => BrandProvider()),
-        ChangeNotifierProvider(create: (_) => ProductProvider()),  // Add this provider
+        ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(create: (_) => FavoritesProvider()),
       ],
       child: MyApp(),
     ),

@@ -1,42 +1,30 @@
+// lib/screens/favorites_screen.dart
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/favorites_provider.dart';
+import '../providers/auth_provider.dart';
+import 'detail_screen.dart';
+import 'sign_in_screen.dart';
 
-class FavoritesScreen extends StatelessWidget {
-  FavoritesScreen({Key? key}) : super(key: key); // Added Key parameter
+class FavoritesScreen extends StatefulWidget {
+  const FavoritesScreen({Key? key}) : super(key: key);
 
-  // list of favorite items
-  final List<Map<String, String>> favoriteItems = [
-    {
-      'name': 'Alienware M18 R2',
-      'image': 'assets/images/Alienware_M18_R2.png',
-      'price': '\$3499',
-    },
-    {
-      'name': 'ROG Strix G15 2022 G513',
-      'image': 'assets/images/ROG_Strix_G15_2022_G513.png',
-      'price': '\$1599',
-    },
-    {
-      'name': 'Lenovo ThinkPad T14',
-      'image': 'assets/images/Lenovo_ThinkPad_T14.png',
-      'price': '\$1199',
-    },
-    {
-      'name': 'ASUS Zenbook Pro 14 OLED',
-      'image': 'assets/images/ASUS_Zenbook_Pro_14_OLED.png',
-      'price': '\$1499',
-    },
-    {
-      'name': 'Razer Blade 14 2024',
-      'image': 'assets/images/Razer_Blade_14_2024.png',
-      'price': '\$2299',
-    },
-    {
-      'name': 'ROG Strix G17',
-      'image': 'assets/images/ROG_Strix_G17.png',
-      'price': '\$1799',
-    },
+  @override
+  _FavoritesScreenState createState() => _FavoritesScreenState();
+}
 
-  ];
+class _FavoritesScreenState extends State<FavoritesScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _loadFavorites();
+  }
+
+  Future<void> _loadFavorites() async {
+    final token = Provider.of<AuthProvider>(context, listen: false).token;
+    await Provider.of<FavoritesProvider>(context, listen: false).fetchFavorites(token);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,181 +35,234 @@ class FavoritesScreen extends StatelessWidget {
           style: Theme.of(context).appBarTheme.titleTextStyle,
         ),
         centerTitle: true,
-        // AppBar styling is managed by the theme
       ),
-      body: favoriteItems.isEmpty
-          ? Center(
-        child: Text(
-          'No favorites added yet!',
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-      )
-          : Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            // Determine the number of columns based on screen width
-            int crossAxisCount = constraints.maxWidth < 600
-                ? 2
-                : constraints.maxWidth < 900
-                ? 3
-                : 4;
-
-            return GridView.builder(
-              itemCount: favoriteItems.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 0.7,
+      body: Consumer2<AuthProvider, FavoritesProvider>(
+        builder: (context, auth, favorites, _) {
+          if (!auth.isAuthenticated) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Please sign in to view your favorites',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SignInScreen()),
+                      );
+                    },
+                    child: Text('Sign In'),
+                  ),
+                ],
               ),
-              itemBuilder: (context, index) {
-                final item = favoriteItems[index];
-                return FavoriteGridItem(
-                  name: item['name']!,
-                  image: item['image']!,
-                  price: item['price']!,
-                );
-              },
             );
-          },
-        ),
+          }
+
+          if (favorites.isLoading) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (favorites.error != null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    favorites.error!,
+                    style: TextStyle(color: Theme.of(context).colorScheme.error),
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _loadFavorites,
+                    child: Text('Retry'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          if (favorites.favorites.isEmpty) {
+            return Center(
+              child: Text(
+                'No favorites added yet!',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: _loadFavorites,
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: GridView.builder(
+                itemCount: favorites.favorites.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 0.7,
+                ),
+                itemBuilder: (context, index) {
+                  final item = favorites.favorites[index];
+                  return FavoriteGridItem(
+                    favoriteItem: item,
+                    onRemove: () async {
+                      await favorites.removeFromFavorites(item.id, auth.token);
+                    },
+                  );
+                },
+              ),
+            ),
+          );
+        },
       ),
     );
   }
 }
 
-// Reusable widget for each favorite grid item
 class FavoriteGridItem extends StatelessWidget {
-  final String name;
-  final String image;
-  final String price;
+  final FavoriteItem favoriteItem;
+  final VoidCallback onRemove;
 
   const FavoriteGridItem({
     Key? key,
-    required this.name,
-    required this.image,
-    required this.price,
+    required this.favoriteItem,
+    required this.onRemove,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // get the card color from on theme
-    final cardColor =
-        Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface;
-
     return Card(
-      color: cardColor,
       elevation: Theme.of(context).cardTheme.elevation ?? 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Stack to place the heart icon over the image
-          Stack(
-            children: [
-              // Product Image
-              ClipRRect(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12.0),
-                  topRight: Radius.circular(12.0),
-                ),
-                child: Image.asset(
-                  image,
-                  width: double.infinity,
-                  height: 120,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: double.infinity,
-                      height: 120,
-                      color: Colors.grey[300],
-                      child: Icon(
-                        Icons.image_not_supported,
-                        color: Colors.grey[700],
-                      ),
-                    );
-                  },
-                ),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DetailScreen(
+                productSlug: favoriteItem.productSlug,
               ),
-              // Heart Icon Positioned at the top-right corner
-              Positioned(
-                top: 8,
-                right: 8,
-                child: InkWell(
-                  onTap: () {
-                    // add Remove from favorites logic
-                  },
-                  child: CircleAvatar(
-                    radius: 16,
-                    backgroundColor:
-                    Theme.of(context).colorScheme.secondary.withOpacity(0.9),
-                    child: Icon(
-                      Icons.favorite,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          // Product Details
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            ),
+          );
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
               children: [
-                // Product Name with fixed height to enforce two lines
-                SizedBox(
-                  height: 40, // Adjust this height based on font size and line height
-                  child: Text(
-                    name,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 2, // Enforce two lines
-                    overflow: TextOverflow.ellipsis,
+                ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12.0),
+                    topRight: Radius.circular(12.0),
                   ),
-                ),
-                SizedBox(height: 4),
-                // Product Price
-                Text(
-                  price,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.green,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                SizedBox(height: 8),
-                // Add to Cart Button aligned at the bottom
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Add to cart logic (not implemented)
+                  child: Image.network(
+                    'https://techwizard-7z3ua.ondigitalocean.app${favoriteItem.productImage}',
+                    width: double.infinity,
+                    height: 120,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: double.infinity,
+                        height: 120,
+                        color: Colors.grey[300],
+                        child: Icon(
+                          Icons.image_not_supported,
+                          color: Colors.grey[700],
+                        ),
+                      );
                     },
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 8.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      // Colors are managed by the theme's ElevatedButtonThemeData
-                    ),
-                    child: Text(
-                      'Add to Cart',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: InkWell(
+                    onTap: onRemove,
+                    child: CircleAvatar(
+                      radius: 16,
+                      backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.9),
+                      child: Icon(
+                        Icons.favorite,
+                        color: Colors.white,
+                        size: 16,
                       ),
                     ),
                   ),
                 ),
+                if (!favoriteItem.inStock)
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      color: Colors.red.withOpacity(0.8),
+                      padding: EdgeInsets.symmetric(vertical: 4),
+                      child: Text(
+                        'Out of Stock',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 40,
+                    child: Text(
+                      favoriteItem.productName,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    '\$${favoriteItem.price}',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.tertiary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: favoriteItem.inStock
+                          ? () {
+                        // Add to cart logic
+                      }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 8.0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                      child: Text('Add to Cart'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
