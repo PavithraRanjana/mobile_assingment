@@ -1,3 +1,5 @@
+// lib/screens/home_page.dart
+
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'favorites_screen.dart';
@@ -12,10 +14,18 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
+  // Using a getter for _screens so it always has access to the current state
+  List<Widget> get _screens => [
     HomeScreen(key: ValueKey('Home')),
     FavoritesScreen(key: ValueKey('Favorites')),
-    CartScreen(key: ValueKey('Cart')),
+    CartScreen(
+      key: ValueKey('Cart'),
+      onContinueShopping: () {
+        setState(() {
+          _currentIndex = 0; // Switch to home tab
+        });
+      },
+    ),
     ProfileScreen(key: ValueKey('Profile')),
   ];
 
@@ -27,7 +37,7 @@ class _HomePageState extends State<HomePage> {
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: CircleAvatar(
-            radius: 20, // avatar radius
+            radius: 20,
             backgroundImage: AssetImage('assets/images/wizard_1.png'),
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
@@ -40,28 +50,20 @@ class _HomePageState extends State<HomePage> {
                 _currentIndex = 2; // Navigate to Cart Screen
               });
             },
-            // Icon color is managed by the AppBarTheme in the theme files
           )
         ],
       ),
       body: AnimatedSwitcher(
-        duration: Duration(milliseconds: 600),
+        duration: Duration(milliseconds: 200),
         transitionBuilder: (Widget child, Animation<double> animation) {
-          // Fade transition
-          return FadeTransition(child: child, opacity: animation);
-        },
-        child: _screens[_currentIndex],
-        layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
-          return Stack(
-            children: <Widget>[
-              ...previousChildren,
-              if (currentChild != null) currentChild,
-            ],
+          return FadeTransition(
+            opacity: animation,
+            child: child,
           );
         },
+        child: _screens[_currentIndex],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
         onTap: (index) {
           if (index != _currentIndex) {
@@ -88,7 +90,7 @@ class _HomePageState extends State<HomePage> {
             label: 'Profile',
           ),
         ],
-        // Colors and styles are managed by the BottomNavigationBarTheme in the theme files
+        type: BottomNavigationBarType.fixed,
       ),
     );
   }

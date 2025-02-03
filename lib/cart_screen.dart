@@ -1,419 +1,397 @@
-// lib/cart_screen.dart
+// lib/screens/cart_screen.dart
 
 import 'package:flutter/material.dart';
-import 'dart:math'; // For min function
+import 'package:provider/provider.dart';
+import '../providers/cart_provider.dart';
+import '../providers/auth_provider.dart';
+import 'sign_in_screen.dart';
 
-class CartScreen extends StatelessWidget {
-  const CartScreen({Key? key}) : super(key: key); // Added Key parameter
+class CartScreen extends StatefulWidget {
+  final VoidCallback onContinueShopping;
+
+  const CartScreen({
+    Key? key,
+    required this.onContinueShopping,
+  }) : super(key: key);
+
+  @override
+  _CartScreenState createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _loadCart();
+  }
+
+  Future<void> _loadCart() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (authProvider.isAuthenticated) {
+      await Provider.of<CartProvider>(context, listen: false)
+          .fetchCart(authProvider.token!);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Sample list of cart items
-    List<Map<String, dynamic>> cartItems = [
-      {
-        'name': 'Alienware M18 R2',
-        'image': 'assets/images/Alienware_M18_R2.png',
-        'price': 3499.0,
-        'quantity': 1,
-      },
-      {
-        'name': 'ROG Zephyrus G16 2024',
-        'image': 'assets/images/ROG_Zephyrus_G16_2024.png',
-        'price': 1899.0,
-        'quantity': 2,
-      },
-      {
-        'name': 'Lenovo ThinkPad T14',
-        'image': 'assets/images/Lenovo_ThinkPad_T14.png',
-        'price': 1199.0,
-        'quantity': 1,
-      },
-    ];
-
-    // Initialize totals as num to accommodate both int and double
-    num totalItems = 0;
-    num totalPrice = 0;
-
-    for (var item in cartItems) {
-      // cast quantity and price to int and double
-      int quantity = item['quantity'] as int;
-      double price = item['price'] as double;
-
-      totalItems += quantity;
-      totalPrice += price * quantity;
-    }
-
-    // get the orientation
-    final Orientation orientation = MediaQuery.of(context).orientation;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'Shopping Cart',
           style: Theme.of(context).appBarTheme.titleTextStyle,
         ),
-        centerTitle: true, // Centers the AppBar title
-        elevation: 0,
+        centerTitle: true,
       ),
-      body: orientation == Orientation.portrait
-          ? _buildPortraitLayout(context, cartItems, totalItems, totalPrice)
-          : _buildLandscapeLayout(context, cartItems, totalItems, totalPrice),
-    );
-  }
-
-  // Portrait Mode Layout: Vertical List of Cart Items
-  Widget _buildPortraitLayout(BuildContext context, List<Map<String, dynamic>> cartItems,
-      num totalItems, num totalPrice) {
-    return ListView.builder(
-      padding: EdgeInsets.only(top: 16.0, bottom: 16.0), // Added top and bottom padding
-      itemCount: cartItems.length + 1, // Additional item for the bottom section
-      itemBuilder: (context, index) {
-        if (index < cartItems.length) {
-          final item = cartItems[index];
-
-          // Cast quantity and price
-          int quantity = item['quantity'] as int;
-          double price = item['price'] as double;
-          double itemTotalPrice = price * quantity;
-
-          return _buildPortraitCartItem(context, item, quantity, itemTotalPrice);
-        } else {
-          // Bottom Total Container
-          return _buildTotalContainer(context, totalItems, totalPrice);
-        }
-      },
-    );
-  }
-
-  // Landscape Mode Layout: Grid with 3 Items per Row
-  Widget _buildLandscapeLayout(BuildContext context, List<Map<String, dynamic>> cartItems,
-      num totalItems, num totalPrice) {
-    // Calculate the number of rows needed (3 items per row)
-    int numRows = (cartItems.length / 3).ceil();
-
-    return ListView.builder(
-      itemCount: numRows + 1, // Additional item for the bottom section
-      itemBuilder: (context, index) {
-        if (index < numRows) {
-          // Determine the start and end indices for the current row
-          int startIndex = index * 3;
-          int endIndex = min(startIndex + 3, cartItems.length);
-          List<Map<String, dynamic>> rowItems = cartItems.sublist(startIndex, endIndex);
-
-          return _buildLandscapeCartRow(context, rowItems);
-        } else {
-          // Bottom Total Container
-          return _buildTotalContainer(context, totalItems, totalPrice);
-        }
-      },
-    );
-  }
-
-  // Portrait Mode Cart Item Widget
-  Widget _buildPortraitCartItem(BuildContext context, Map<String, dynamic> item, int quantity,
-      double itemTotalPrice) {
-    return Card(
-      margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-      child: Padding(
-        padding: EdgeInsets.all(12.0),
-        child: Row(
-          children: [
-            // Item Image (Scaled Down)
-            Container(
-              width: 50, // Scaled down width
-              height: 50, // Scaled down height
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.0),
-                image: DecorationImage(
-                  image: AssetImage(item['image']),
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-            SizedBox(width: 10),
-            // Item Details
-            Expanded(
+      body: Consumer2<AuthProvider, CartProvider>(
+        builder: (context, auth, cart, _) {
+          if (!auth.isAuthenticated) {
+            return Center(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Item Name
-                  Text(
-                    item['name'],
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                  Icon(
+                    Icons.shopping_cart_outlined,
+                    size: 64,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
-                  SizedBox(height: 5),
-                  // Quantity Controls and Price
-                  Row(
-                    children: [
-                      // Decrease Quantity Button
-                      IconButton(
-                        icon: Icon(Icons.remove_circle_outline),
-                        onPressed: () {
-                          // Decrease quantity logic (not implemented)
-                        },
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      // Quantity Text
-                      Text(
-                        '$quantity',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontSize: 16,
-                        ),
-                      ),
-                      // Increase Quantity Button
-                      IconButton(
-                        icon: Icon(Icons.add_circle_outline),
-                        onPressed: () {
-                          // Increase quantity logic (not implemented)
-                        },
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      SizedBox(width: 15), // Adjusted spacing
-                      // Item Total Price
-                      Text(
-                        '\$${itemTotalPrice.toStringAsFixed(2)}',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                  SizedBox(height: 16),
+                  Text(
+                    'Please sign in to view your cart',
+                    style: Theme.of(context).textTheme.titleMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Sign in to start adding items to your cart',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SignInScreen()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(horizontal: 48, vertical: 12),
+                    ),
+                    child: Text('Sign In'),
                   ),
                 ],
               ),
-            ),
-            // Delete Button
-            IconButton(
-              icon: Icon(Icons.delete_outline),
-              onPressed: () {
-                // Delete item logic (not implemented)
-              },
-              color: Theme.of(context).colorScheme.secondary,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+            );
+          }
 
-  // Landscape Mode Cart Row Widget: Contains up to 3 Cart Items Side by Side
-  Widget _buildLandscapeCartRow(BuildContext context, List<Map<String, dynamic>> rowItems) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-      child: Row(
-        children: rowItems.map((item) {
-          // Cast quantity and price
-          int quantity = item['quantity'] as int;
-          double price = item['price'] as double;
-          double itemTotalPrice = price * quantity;
+          if (cart.isLoading) {
+            return Center(child: CircularProgressIndicator());
+          }
 
-          return Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
-              child: Card(
-                child: Padding(
-                  padding: EdgeInsets.all(12.0),
-                  child: Column(
-                    children: [
-                      // Item Image (Spanning Full Width)
-                      Container(
-                        width: double.infinity, // Makes image width as much as card's width
-                        height: 120,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8.0),
-                          image: DecorationImage(
-                            image: AssetImage(item['image']),
-                            fit: BoxFit.contain, // Use BoxFit.contain
+          if (cart.error != null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    cart.error!,
+                    style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _loadCart,
+                    child: Text('Retry'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          if (cart.items.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.shopping_cart_outlined,
+                    size: 64,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Your cart is empty',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: widget.onContinueShopping,
+                    child: Text('Continue Shopping'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return Column(
+            children: [
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: _loadCart,
+                  child: ListView.builder(
+                    padding: EdgeInsets.all(16),
+                    itemCount: cart.items.length,
+                    itemBuilder: (context, index) {
+                      final item = cart.items[index];
+                      return Dismissible(
+                        key: Key(item.productId + item.variantId),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          alignment: Alignment.centerRight,
+                          padding: EdgeInsets.only(right: 20),
+                          color: Theme.of(context).colorScheme.error,
+                          child: Icon(
+                            Icons.delete,
+                            color: Colors.white,
                           ),
                         ),
-                      ),
-                      SizedBox(height: 10),
-                      // Item Name
-                      Text(
-                        item['name'],
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: 10),
-                      // Quantity Controls
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // Decrease Quantity Button
-                          IconButton(
-                            icon: Icon(Icons.remove_circle_outline),
-                            onPressed: () {
-                              // Decrease quantity logic (not implemented)
-                            },
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          // Quantity Text
-                          Text(
-                            '$quantity',
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              fontSize: 16,
+                        confirmDismiss: (direction) async {
+                          return await showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Text('Remove Item'),
+                              content: Text('Are you sure you want to remove this item from your cart?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, false),
+                                  child: Text('Cancel'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  child: Text('Remove'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Theme.of(context).colorScheme.error,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        onDismissed: (direction) async {
+                          await cart.removeItem(
+                            item.productId,
+                            item.variantId,
+                            auth.token!,
+                          );
+                        },
+                        child: Card(
+                          margin: EdgeInsets.only(bottom: 16),
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                // Product Image
+                                Container(
+                                  width: 80,
+                                  height: 80,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    image: DecorationImage(
+                                      image: NetworkImage(
+                                        'https://techwizard-7z3ua.ondigitalocean.app${item.image}',
+                                      ),
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 16),
+                                // Product Details
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item.name,
+                                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        '\$${item.price}',
+                                        style: TextStyle(
+                                          color: Theme.of(context).colorScheme.tertiary,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      SizedBox(height: 8),
+                                      Row(
+                                        children: [
+                                          IconButton(
+                                            icon: Icon(Icons.remove_circle_outline),
+                                            onPressed: cart.isItemLoading(item.productId)
+                                                ? null
+                                                : () async {
+                                              if (item.quantity > 1) {
+                                                await cart.updateQuantity(
+                                                  item.productId,
+                                                  item.variantId,
+                                                  item.quantity - 1,
+                                                  auth.token!,
+                                                );
+                                              }
+                                            },
+                                            color: Theme.of(context).colorScheme.primary,
+                                          ),
+                                          if (cart.isItemLoading(item.productId))
+                                            SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                              ),
+                                            )
+                                          else
+                                            Text(
+                                              item.quantity.toString(),
+                                              style: Theme.of(context).textTheme.titleMedium,
+                                            ),
+                                          IconButton(
+                                            icon: Icon(Icons.add_circle_outline),
+                                            onPressed: cart.isItemLoading(item.productId)
+                                                ? null
+                                                : () async {
+                                              await cart.updateQuantity(
+                                                item.productId,
+                                                item.variantId,
+                                                item.quantity + 1,
+                                                auth.token!,
+                                              );
+                                            },
+                                            color: Theme.of(context).colorScheme.primary,
+                                          ),
+                                          Spacer(),
+                                          IconButton(
+                                            icon: Icon(Icons.delete_outline),
+                                            onPressed: cart.isItemLoading(item.productId)
+                                                ? null
+                                                : () async {
+                                              bool? confirm = await showDialog(
+                                                context: context,
+                                                builder: (context) => AlertDialog(
+                                                  title: Text('Remove Item'),
+                                                  content: Text('Are you sure you want to remove this item from your cart?'),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () => Navigator.pop(context, false),
+                                                      child: Text('Cancel'),
+                                                    ),
+                                                    ElevatedButton(
+                                                      onPressed: () => Navigator.pop(context, true),
+                                                      child: Text('Remove'),
+                                                      style: ElevatedButton.styleFrom(
+                                                        backgroundColor: Theme.of(context).colorScheme.error,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                              if (confirm == true) {
+                                                await cart.removeItem(
+                                                  item.productId,
+                                                  item.variantId,
+                                                  auth.token!,
+                                                );
+                                              }
+                                            },
+                                            color: Theme.of(context).colorScheme.error,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          // Increase Quantity Button
-                          IconButton(
-                            icon: Icon(Icons.add_circle_outline),
-                            onPressed: () {
-                              // Increase quantity logic (not implemented)
-                            },
-                            color: Theme.of(context).colorScheme.primary,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              // Cart Summary
+              Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      offset: Offset(0, -2),
+                      blurRadius: 6,
+                    ),
+                  ],
+                ),
+                child: SafeArea(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Total Items:',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          Text(
+                            cart.count.toString(),
+                            style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ],
                       ),
-                      SizedBox(height: 5),
-                      // Delete Button
-                      IconButton(
-                        icon: Icon(Icons.delete_outline),
-                        onPressed: () {
-                          // Delete item logic (not implemented)
-                        },
-                        color: Theme.of(context).colorScheme.secondary,
+                      SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Total Amount:',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            '\${cart.total.toStringAsFixed(2)}',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.tertiary,
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 5),
-                      // Item Total Price
-                      Text(
-                        '\$${itemTotalPrice.toStringAsFixed(2)}',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                      SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // TODO: Implement checkout
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          child: Text('Proceed to Checkout'),
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-            ),
+            ],
           );
-        }).toList(),
-      ),
-    );
-  }
-
-  // Bottom Total Container Widget
-  Widget _buildTotalContainer(BuildContext context, num totalItems, num totalPrice) {
-    return Container(
-      padding: EdgeInsets.all(16.0),
-      color: Theme.of(context).colorScheme.surface.withOpacity(0.1),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Total Number of Items
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Total number of items:',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                '$totalItems',
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            ],
-          ),
-          SizedBox(height: 5),
-          // Price
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Price:',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                '\$${totalPrice.toStringAsFixed(2)}',
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            ],
-          ),
-          SizedBox(height: 5),
-          // Total Price
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Total Price:',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                '\$${totalPrice.toStringAsFixed(2)}',
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            ],
-          ),
-          SizedBox(height: 10),
-          // Checkout Button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                // Checkout logic (not implemented)
-              },
-              child: Text('Checkout'),
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 15.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                // Colors are managed by the theme's ElevatedButtonThemeData
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Reusable widget for Specification Items
-class SpecificationItem extends StatelessWidget {
-  final String title;
-  final String value;
-
-  const SpecificationItem({
-    Key? key,
-    required this.title,
-    required this.value,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        children: [
-          // Specification Title
-          Expanded(
-            flex: 2,
-            child: Text(
-              '$title:',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          // Specification Value
-          Expanded(
-            flex: 3,
-            child: Text(value),
-          ),
-        ],
+        },
       ),
     );
   }

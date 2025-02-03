@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:mobile_assingment/providers/brand_provider.dart';
+import 'package:mobile_assingment/providers/cart_provider.dart';
 import 'package:mobile_assingment/providers/category_provider.dart';
 import 'package:mobile_assingment/providers/product_provider.dart';
 import 'package:mobile_assingment/providers/favorites_provider.dart';
@@ -21,6 +22,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => BrandProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
       child: MyApp(),
     ),
