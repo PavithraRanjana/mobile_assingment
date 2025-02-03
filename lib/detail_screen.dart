@@ -3,6 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/product_provider.dart';
+import '../providers/auth_provider.dart';
+import '../providers/favorites_provider.dart';
+import '../sign_in_screen.dart';
 
 class DetailScreen extends StatefulWidget {
   final String productSlug;
@@ -21,8 +24,16 @@ class _DetailScreenState extends State<DetailScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Fetch product details
       Provider.of<ProductProvider>(context, listen: false)
           .fetchProductBySlug(widget.productSlug);
+
+      // Fetch favorites if user is authenticated
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      if (authProvider.isAuthenticated) {
+        Provider.of<FavoritesProvider>(context, listen: false)
+            .fetchFavorites(authProvider.token);
+      }
     });
   }
 
@@ -32,6 +43,61 @@ class _DetailScreenState extends State<DetailScreen> {
       orElse: () => variants.first,
     );
     return defaultVariant['price']['current'];
+  }
+
+  void _handleFavoritePress(BuildContext context, String productId, String productName, String productSlug, String productImage, String price) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final favoritesProvider = Provider.of<FavoritesProvider>(context, listen: false);
+
+    if (!authProvider.isAuthenticated) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Sign In Required'),
+          content: Text('Please sign in to add items to your favorites.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SignInScreen(),
+                  ),
+                );
+              },
+              child: Text('Sign In'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    try {
+      bool success;
+      if (favoritesProvider.isFavorite(productId)) {
+        success = await favoritesProvider.removeFromFavorites(productId, authProvider.token);
+      } else {
+        success = await favoritesProvider.addToFavorites(productId, authProvider.token);
+      }
+
+      if (success) {
+        // Manually trigger a favorites refresh
+        await favoritesProvider.fetchFavorites(authProvider.token);
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to update favorites. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -91,14 +157,37 @@ class _DetailScreenState extends State<DetailScreen> {
                       right: 16,
                       child: CircleAvatar(
                         backgroundColor: Colors.white.withOpacity(0.9),
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.favorite_border,
-                            color: Colors.red,
-                          ),
-                          onPressed: () {
-                            // Add to favorites logic
-                          },
+                        child: Consumer2<AuthProvider, FavoritesProvider>(
+                          builder: (context, auth, favorites, _) {
+                            final productId = product['id'];
+                            final isLoading = favorites.isProductLoading(productId);
+                            final isFavorite = favorites.favorites.any((item) => item.productId == productId);
+
+                            if (isLoading) {
+                              return SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                                ),
+                              );
+                            }
+
+                            return IconButton(
+                                icon: Icon(
+                                isFavorite ? Icons.favorite : Icons.favorite_border,
+                                color: Colors.red,
+                            ),
+                            onPressed: () => _handleFavoritePress(
+                            context,
+                            productId,
+                            product['name'],
+                            product['slug'],
+                            product['images']['primary'],
+                            _getDefaultPrice(product['variants']),
+                            ));
+                            },
                         ),
                       ),
                     ),

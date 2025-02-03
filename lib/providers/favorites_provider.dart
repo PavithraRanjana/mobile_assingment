@@ -45,9 +45,16 @@ class FavoritesProvider with ChangeNotifier {
   bool _isLoading = false;
   String? _error;
 
+  // Track loading state for individual products
+  Map<String, bool> _productLoadingStates = {};
+
+  // Getters
   List<FavoriteItem> get favorites => _favorites;
   bool get isLoading => _isLoading;
   String? get error => _error;
+
+  // Check if a specific product is loading
+  bool isProductLoading(String productId) => _productLoadingStates[productId] ?? false;
 
   Future<void> fetchFavorites(String? token) async {
     if (token == null) {
@@ -83,6 +90,7 @@ class FavoritesProvider with ChangeNotifier {
         _error = 'Failed to load favorites';
       }
     } catch (e) {
+      print('Error fetching favorites: $e');
       _error = 'Network error occurred';
     } finally {
       _isLoading = false;
@@ -93,9 +101,12 @@ class FavoritesProvider with ChangeNotifier {
   Future<bool> addToFavorites(String productId, String? token) async {
     if (token == null) return false;
 
+    _productLoadingStates[productId] = true;
+    notifyListeners();
+
     try {
       final response = await http.post(
-        Uri.parse('https://techwizard-7z3ua.ondigitalocean.app/api/wishlist'),
+        Uri.parse('https://techwizard-7z3ua.ondigitalocean.app/api/wishlist/add'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -106,17 +117,46 @@ class FavoritesProvider with ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        await fetchFavorites(token);
-        return true;
+        final data = json.decode(response.body);
+        if (data['status'] == true) {
+          // Create a temporary FavoriteItem for immediate UI update
+          final tempFavoriteItem = FavoriteItem(
+            id: DateTime.now().toString(), // Temporary ID
+            productId: productId,
+            productName: "", // These details will be updated when fetchFavorites is called
+            productSlug: "",
+            productImage: "",
+            price: "",
+            inStock: true,
+            addedAt: DateTime.now(),
+          );
+
+          // Add to local list immediately
+          _favorites.add(tempFavoriteItem);
+          notifyListeners();
+
+          // Fetch the complete list in the background
+          fetchFavorites(token);
+          return true;
+        }
       }
+      print('Failed to add favorite. Status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
       return false;
     } catch (e) {
+      print('Error adding to favorites: $e');
       return false;
+    } finally {
+      _productLoadingStates[productId] = false;
+      notifyListeners();
     }
   }
 
   Future<bool> removeFromFavorites(String productId, String? token) async {
     if (token == null) return false;
+
+    _productLoadingStates[productId] = true;
+    notifyListeners();
 
     try {
       final response = await http.delete(
@@ -131,12 +171,39 @@ class FavoritesProvider with ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        await fetchFavorites(token);
-        return true;
+        final data = json.decode(response.body);
+        if (data['status'] == true) {
+          // Remove from local list immediately
+          _favorites.removeWhere((item) => item.productId == productId);
+          notifyListeners();
+
+          // Fetch the complete list in the background
+          fetchFavorites(token);
+          return true;
+        }
       }
+      print('Failed to remove favorite. Status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
       return false;
     } catch (e) {
+      print('Error removing from favorites: $e');
       return false;
+    } finally {
+      _productLoadingStates[productId] = false;
+      notifyListeners();
     }
+  }
+
+  // Clear favorites (useful for logout)
+  void clearFavorites() {
+    _favorites = [];
+    _productLoadingStates.clear();
+    _error = null;
+    notifyListeners();
+  }
+
+  // Check if a product exists in favorites
+  bool isFavorite(String productId) {
+    return _favorites.any((item) => item.productId == productId);
   }
 }
