@@ -153,11 +153,26 @@ class CartProvider with ChangeNotifier {
   }
 
   // Add to cart
-  Future<bool> addToCart(String productId, String variantId, String token) async {
+// In CartProvider class
+
+  Future<bool> addToCart(String productId, String? variantId, String token) async {
     _isLoading = true;
     notifyListeners();
 
     try {
+      // Create the request body
+      Map<String, dynamic> requestBody = {
+        "product_id": productId,
+        "quantity": 1,
+      };
+
+      // Only add variant_id if it's provided
+      if (variantId != null && variantId.isNotEmpty) {
+        requestBody["variant_id"] = variantId;
+      }
+
+      print('Request body: ${jsonEncode(requestBody)}');
+
       final response = await http.post(
         Uri.parse('https://techwizard-7z3ua.ondigitalocean.app/api/cart/add'),
         headers: {
@@ -165,19 +180,19 @@ class CartProvider with ChangeNotifier {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
-        body: json.encode({
-          'product_id': productId,
-          'variant_id': variantId,
-          'quantity': 1, // Default to 1 when adding new item
-        }),
+        body: jsonEncode(requestBody),
       );
 
-      if (response.statusCode == 200) {
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
         await fetchCart(token);
         return true;
       }
       return false;
     } catch (e) {
+      print('Cart Error: $e');
       return false;
     } finally {
       _isLoading = false;
