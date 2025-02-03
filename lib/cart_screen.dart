@@ -364,7 +364,7 @@ class _CartScreenState extends State<CartScreen> {
                             ),
                           ),
                           Text(
-                            '\${cart.total.toStringAsFixed(2)}',
+                            '\$${cart.total.toStringAsFixed(2)}',  // Properly format with $ symbol
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).colorScheme.tertiary,

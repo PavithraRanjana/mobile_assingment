@@ -38,7 +38,7 @@ class CartItem {
 
 class CartProvider with ChangeNotifier {
   List<CartItem> _items = [];
-  double _total = 0;
+  double _total = 0.0;  // Changed from String to double
   int _count = 0;
   bool _isLoading = false;
   String? _error;
@@ -46,7 +46,7 @@ class CartProvider with ChangeNotifier {
 
   // Getters
   List<CartItem> get items => _items;
-  double get total => _total;
+  double get total => _total;  // Changed return type to double
   int get count => _count;
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -72,7 +72,7 @@ class CartProvider with ChangeNotifier {
         _items = (data['items'] as List)
             .map((item) => CartItem.fromJson(item))
             .toList();
-        _total = double.parse(data['total'].toString());
+        _total = double.parse(data['total'].toString());  // Parse as double
         _count = data['count'];
         _error = null;
       } else {
@@ -85,6 +85,7 @@ class CartProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
 
   // Update cart item quantity
   Future<bool> updateQuantity(String productId, String variantId, int quantity, String token) async {
@@ -186,7 +187,7 @@ class CartProvider with ChangeNotifier {
 
   void clearCart() {
     _items = [];
-    _total = 0;
+    _total = 0.0;  // Reset to 0.0 instead of String
     _count = 0;
     _loadingItems = {};
     _error = null;
