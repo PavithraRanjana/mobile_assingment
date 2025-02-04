@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/cart_provider.dart';
 import 'detail_screen.dart';
 import 'sign_in_screen.dart';
+import 'cart_screen.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({Key? key}) : super(key: key);
@@ -243,19 +245,79 @@ class FavoriteGridItem extends StatelessWidget {
                   SizedBox(height: 8),
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: favoriteItem.inStock
-                          ? () {
-                        // Add to cart logic
-                      }
-                          : null,
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 8.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
+                    child: Consumer2<AuthProvider, CartProvider>(
+                      builder: (context, auth, cart, _) => ElevatedButton(
+                        onPressed: favoriteItem.inStock
+                            ? () async {
+                          try {
+                            final success = await cart.addToCart(
+                              favoriteItem.productId,
+                              null, // Assuming default variant
+                              auth.token!,
+                            );
+
+                            if (!context.mounted) return;
+
+                            if (success) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Product added to cart successfully'),
+                                  backgroundColor: Colors.green,
+                                  action: SnackBarAction(
+                                    label: 'VIEW CART',
+                                    textColor: Colors.white,
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => CartScreen(
+                                            onContinueShopping: () {
+                                              Navigator.pop(context);
+                                            },
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Failed to add product to cart'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('An error occurred'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
                         ),
+                        child: cart.isLoading
+                            ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Theme.of(context).colorScheme.onPrimary,
+                            ),
+                          ),
+                        )
+                            : Text('Add to Cart'),
                       ),
-                      child: Text('Add to Cart'),
                     ),
                   ),
                 ],
