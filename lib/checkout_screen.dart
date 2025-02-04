@@ -7,6 +7,7 @@ import '../providers/auth_provider.dart';
 import '../providers/cart_provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'confirmation_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({Key? key}) : super(key: key);
@@ -17,16 +18,20 @@ class CheckoutScreen extends StatefulWidget {
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final _formKey = GlobalKey<FormState>();
+
   bool _isLoading = false;
+
   String? _errorMessage;
 
   // Billing Details Controllers
+
   final _emailController = TextEditingController();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _phoneController = TextEditingController();
 
   // Shipping Address Controllers
+
   final _addressController = TextEditingController();
   final _cityController = TextEditingController();
   final _stateController = TextEditingController();
@@ -34,6 +39,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final _countryController = TextEditingController();
 
   // Payment Details Controllers
+
   final _cardNumberController = TextEditingController();
   final _cvvController = TextEditingController();
   final _expirationController = TextEditingController();
@@ -60,10 +66,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     setState(() {
       _isLoading = true;
+
       _errorMessage = null;
     });
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
 
     try {
@@ -103,40 +111,45 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
         if (responseData['status'] == true) {
           // Clear cart after successful order
+
           cartProvider.clearCart();
 
           final orderData = responseData['data'];
+
           final orderId = orderData['order_id'];
+
           final total = orderData['total'];
 
           // Show success dialog with order details
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => AlertDialog(
-              title: Text('Order Placed Successfully'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Thank you for your purchase!'),
-                  SizedBox(height: 8),
-                  Text('Order ID: $orderId'),
-                  Text('Total Amount: \${(total / 100).toStringAsFixed(2)}'),
-                  SizedBox(height: 8),
-                  Text('A confirmation email has been sent to ${_emailController.text}'),
-                ],
-              ),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Pop twice to return to cart screen
-                    Navigator.of(context).pop(); // Close dialog
-                    Navigator.of(context).pop(); // Return to previous screen
+          // Navigate to confirmation screen with order data
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OrderConfirmationScreen(
+                orderData: {
+                  'order_id': orderId,
+                  'total': total,
+                  'items': cartProvider.items.map((item) => {
+                    'name': item.name,
+                    'quantity': item.quantity,
+                    'price': item.price,
+                    'image': item.image,
+                  }).toList(),
+                  'billing_details': {
+                    'first_name': _firstNameController.text,
+                    'last_name': _lastNameController.text,
+                    'email': _emailController.text,
+                    'phone': _phoneController.text,
                   },
-                  child: Text('OK'),
-                ),
-              ],
+                  'shipping_address': {
+                    'address': _addressController.text,
+                    'city': _cityController.text,
+                    'state': _stateController.text,
+                    'postal_code': _postalCodeController.text,
+                    'country': _countryController.text,
+                  },
+                },
+              ),
             ),
           );
         } else {
@@ -164,10 +177,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     if (value == null || value.isEmpty) {
       return 'Please enter card number';
     }
+
     final cleanNumber = value.replaceAll(' ', '');
+
     if (cleanNumber.length != 16) {
       return 'Card number must be 16 digits';
     }
+
     return null;
   }
 
@@ -175,9 +191,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     if (value == null || value.isEmpty) {
       return 'Please enter expiration date';
     }
+
     if (!RegExp(r'^\d{2}/\d{2}$').hasMatch(value)) {
       return 'Use format MM/YY';
     }
+
     return null;
   }
 
@@ -210,6 +228,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ),
 
                     // Order Summary
+
                     Card(
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
@@ -239,7 +258,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 Text(
                                   '\$${cart.total.toStringAsFixed(2)}',
                                   style: TextStyle(
-                                    color: Theme.of(context).colorScheme.tertiary,
+                                    color:
+                                        Theme.of(context).colorScheme.tertiary,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -249,14 +269,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         ),
                       ),
                     ),
+
                     SizedBox(height: 24),
 
                     // Billing Details Section
+
                     Text(
                       'Billing Details',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
+
                     SizedBox(height: 16),
+
                     TextFormField(
                       controller: _emailController,
                       decoration: InputDecoration(
@@ -268,14 +292,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your email';
                         }
+
                         if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                             .hasMatch(value)) {
                           return 'Please enter a valid email';
                         }
+
                         return null;
                       },
                     ),
+
                     SizedBox(height: 16),
+
                     Row(
                       children: [
                         Expanded(
@@ -286,7 +314,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               prefixIcon: Icon(Icons.person),
                             ),
                             validator: (value) =>
-                            value?.isEmpty == true ? 'Required' : null,
+                                value?.isEmpty == true ? 'Required' : null,
                           ),
                         ),
                         SizedBox(width: 16),
@@ -298,12 +326,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               prefixIcon: Icon(Icons.person_outline),
                             ),
                             validator: (value) =>
-                            value?.isEmpty == true ? 'Required' : null,
+                                value?.isEmpty == true ? 'Required' : null,
                           ),
                         ),
                       ],
                     ),
+
                     SizedBox(height: 16),
+
                     TextFormField(
                       controller: _phoneController,
                       decoration: InputDecoration(
@@ -312,16 +342,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ),
                       keyboardType: TextInputType.phone,
                       validator: (value) =>
-                      value?.isEmpty == true ? 'Required' : null,
+                          value?.isEmpty == true ? 'Required' : null,
                     ),
+
                     SizedBox(height: 24),
 
                     // Shipping Address Section
+
                     Text(
                       'Shipping Address',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
+
                     SizedBox(height: 16),
+
                     TextFormField(
                       controller: _addressController,
                       decoration: InputDecoration(
@@ -329,9 +363,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         prefixIcon: Icon(Icons.home),
                       ),
                       validator: (value) =>
-                      value?.isEmpty == true ? 'Required' : null,
+                          value?.isEmpty == true ? 'Required' : null,
                     ),
+
                     SizedBox(height: 16),
+
                     Row(
                       children: [
                         Expanded(
@@ -342,7 +378,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               prefixIcon: Icon(Icons.location_city),
                             ),
                             validator: (value) =>
-                            value?.isEmpty == true ? 'Required' : null,
+                                value?.isEmpty == true ? 'Required' : null,
                           ),
                         ),
                         SizedBox(width: 16),
@@ -354,12 +390,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               prefixIcon: Icon(Icons.map),
                             ),
                             validator: (value) =>
-                            value?.isEmpty == true ? 'Required' : null,
+                                value?.isEmpty == true ? 'Required' : null,
                           ),
                         ),
                       ],
                     ),
+
                     SizedBox(height: 16),
+
                     Row(
                       children: [
                         Expanded(
@@ -371,7 +409,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ),
                             keyboardType: TextInputType.number,
                             validator: (value) =>
-                            value?.isEmpty == true ? 'Required' : null,
+                                value?.isEmpty == true ? 'Required' : null,
                           ),
                         ),
                         SizedBox(width: 16),
@@ -383,19 +421,23 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               prefixIcon: Icon(Icons.public),
                             ),
                             validator: (value) =>
-                            value?.isEmpty == true ? 'Required' : null,
+                                value?.isEmpty == true ? 'Required' : null,
                           ),
                         ),
                       ],
                     ),
+
                     SizedBox(height: 24),
 
                     // Payment Details Section
+
                     Text(
                       'Payment Details',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
+
                     SizedBox(height: 16),
+
                     TextFormField(
                       controller: _cardNumberController,
                       decoration: InputDecoration(
@@ -410,7 +452,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ],
                       validator: _validateCardNumber,
                     ),
+
                     SizedBox(height: 16),
+
                     Row(
                       children: [
                         Expanded(
@@ -447,18 +491,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               if (value == null || value.isEmpty) {
                                 return 'Required';
                               }
+
                               if (value.length != 3) {
                                 return 'Invalid CVV';
                               }
+
                               return null;
                             },
                           ),
                         ),
                       ],
                     ),
+
                     SizedBox(height: 32),
 
                     // Place Order Button
+
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -468,27 +516,30 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         ),
                         child: _isLoading
                             ? SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Theme.of(context).colorScheme.onPrimary,
-                            ),
-                          ),
-                        )
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Theme.of(context).colorScheme.onPrimary,
+                                  ),
+                                ),
+                              )
                             : Text(
-                          'Place Order',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
-                              ?.copyWith(
-                            color: Theme.of(context).colorScheme.onPrimary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                                'Place Order',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
                       ),
                     ),
+
                     SizedBox(height: 32),
                   ],
                 ),
@@ -502,23 +553,26 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 }
 
 // Custom Formatter for Card Number Input
+
 class _CardNumberFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue,
-      TextEditingValue newValue,
-      ) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     if (newValue.text.isEmpty) {
       return newValue;
     }
 
     String numbers = newValue.text.replaceAll(' ', '');
+
     String formatted = '';
 
     for (int i = 0; i < numbers.length; i++) {
       if (i > 0 && i % 4 == 0) {
         formatted += ' ';
       }
+
       formatted += numbers[i];
     }
 
@@ -530,23 +584,26 @@ class _CardNumberFormatter extends TextInputFormatter {
 }
 
 // Custom Formatter for Expiration Date Input
+
 class _ExpirationDateFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue,
-      TextEditingValue newValue,
-      ) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     if (newValue.text.isEmpty) {
       return newValue;
     }
 
     String numbers = newValue.text.replaceAll('/', '');
+
     String formatted = '';
 
     for (int i = 0; i < numbers.length; i++) {
       if (i == 2 && numbers.length > 2) {
         formatted += '/';
       }
+
       formatted += numbers[i];
     }
 
