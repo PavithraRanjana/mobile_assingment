@@ -126,29 +126,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             context,
             MaterialPageRoute(
               builder: (context) => OrderConfirmationScreen(
-                orderData: {
-                  'order_id': orderId,
-                  'total': total,
-                  'items': cartProvider.items.map((item) => {
-                    'name': item.name,
-                    'quantity': item.quantity,
-                    'price': item.price,
-                    'image': item.image,
-                  }).toList(),
-                  'billing_details': {
-                    'first_name': _firstNameController.text,
-                    'last_name': _lastNameController.text,
-                    'email': _emailController.text,
-                    'phone': _phoneController.text,
-                  },
-                  'shipping_address': {
-                    'address': _addressController.text,
-                    'city': _cityController.text,
-                    'state': _stateController.text,
-                    'postal_code': _postalCodeController.text,
-                    'country': _countryController.text,
-                  },
-                },
+                orderData: responseData['data'],
               ),
             ),
           );

@@ -12,10 +12,13 @@ class OrderConfirmationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = orderData['items'] as List;
+    // Get data from the API response structure
+    final items = (orderData['items'] as List?) ?? [];
     final total = orderData['total'];
     final billingDetails = orderData['billing_details'];
     final shippingAddress = orderData['shipping_address'];
+    final orderId = orderData['order_id'];
+    final status = orderData['status'];
 
     return Scaffold(
       appBar: AppBar(
@@ -35,125 +38,109 @@ class OrderConfirmationScreen extends StatelessWidget {
                   children: [
                     Icon(
                       Icons.check_circle,
-                      color: Theme.of(context).colorScheme.tertiary,
+                      color: Colors.green,
                       size: 64,
                     ),
                     SizedBox(height: 16),
                     Text(
                       'Order Placed Successfully!',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     SizedBox(height: 8),
                     Text(
-                      'Order ID: ${orderData['order_id']}',
-                      style: Theme.of(context).textTheme.titleMedium,
+                      'Order ID: $orderId',
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     SizedBox(height: 8),
                     Text(
-                      'Status: ${orderData['status']?.toUpperCase() ?? 'PENDING'}',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
+                      'Delivery: ${status?.toUpperCase() ?? 'PENDING'}',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.blue,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 32),
-
-              // Order Items
-              Text(
-                'Order Items',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 16),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: items.length,
-                itemBuilder: (context, index) {
-                  final item = items[index];
-                  return Card(
-                    margin: EdgeInsets.only(bottom: 12),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Product Image
-                          Container(
-                            width: 80,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              image: DecorationImage(
-                                image: NetworkImage(
-                                  'https://techwizard-7z3ua.ondigitalocean.app${item['image']}',
-                                ),
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 12),
-                          // Product Details
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  item['name'],
-                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  'Quantity: ${item['quantity']}',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  '\$${item['price']}',
-                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    color: Theme.of(context).colorScheme.tertiary,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
               SizedBox(height: 24),
 
-              // Total Amount
+              // Order Items Section
+              Text(
+                'Order Items',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              SizedBox(height: 8),
+
+              // Order Items and Total Card
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Total Amount:',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        'Total Amount: \$${total.toString()}',
+                        style: TextStyle(
+                          color: Colors.green,
                           fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
                       ),
-                      Text(
-                        '\$${total}',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.tertiary,
-                          fontWeight: FontWeight.bold,
+                      if (items.isNotEmpty) ...[
+                        SizedBox(height: 16),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: items.length,
+                          itemBuilder: (context, index) {
+                            final item = items[index];
+                            return Padding(
+                              padding: EdgeInsets.only(bottom: 12),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Product Image
+                                  Container(
+                                    width: 60,
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      image: DecorationImage(
+                                        image: NetworkImage(
+                                          'https://techwizard-7z3ua.ondigitalocean.app${item['image']}',
+                                        ),
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 12),
+                                  // Product Details
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item['name'],
+                                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          'Quantity: ${item['quantity']} × \$${item['price']}',
+                                          style: Theme.of(context).textTheme.bodySmall,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
@@ -163,11 +150,9 @@ class OrderConfirmationScreen extends StatelessWidget {
               // Shipping Details
               Text(
                 'Shipping Details',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(context).textTheme.titleMedium,
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 8),
               Card(
                 child: Container(
                   width: double.infinity,
@@ -177,37 +162,24 @@ class OrderConfirmationScreen extends StatelessWidget {
                     children: [
                       Text(
                         '${billingDetails['first_name']} ${billingDetails['last_name']}',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       SizedBox(height: 8),
-                      Text(
-                        shippingAddress['address'],
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
+                      Text(shippingAddress['address']),
                       Text(
                         '${shippingAddress['city']}, ${shippingAddress['state']} ${shippingAddress['postal_code']}',
-                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
-                      Text(
-                        shippingAddress['country'],
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                      SizedBox(height: 12),
-                      Text(
-                        billingDetails['email'],
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                      Text(
-                        billingDetails['phone'],
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
+                      Text(shippingAddress['country']),
+                      SizedBox(height: 8),
+                      Text(billingDetails['phone']),
+                      Text(billingDetails['email']),
                     ],
                   ),
                 ),
               ),
-              SizedBox(height: 32),
+              SizedBox(height: 24),
 
               // Continue Shopping Button
               SizedBox(
@@ -219,13 +191,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 16),
                   ),
-                  child: Text(
-                    'Continue Shopping',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: Text('Continue Shopping'),
                 ),
               ),
             ],
